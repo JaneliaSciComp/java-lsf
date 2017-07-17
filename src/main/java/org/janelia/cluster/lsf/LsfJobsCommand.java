@@ -1,4 +1,4 @@
-package org.janelia.lsf;
+package org.janelia.cluster.lsf;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.janelia.cluster.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +29,11 @@ public class LsfJobsCommand {
     private static final String BJOBS_COMMAND = "bjobs";
     private static final Character BJOBS_DELIMITER = ',';
 
-    public List<JobInfo> run() throws IOException {
-        return run(null);
+    public List<JobInfo> execute() throws IOException {
+        return execute(null);
     }
     
-    public List<JobInfo> run(String user) throws IOException {
+    public List<JobInfo> execute(String user) throws IOException {
 
         String formatSpec = "jobid name from_host exec_host stat queue project "
                 + "max_req_proc nalloc_slot submit_time start_time finish_time "
@@ -89,12 +90,12 @@ public class LsfJobsCommand {
                         }
                     }
                     
-                    JobInfo info = new JobInfo();
+                    LsfJobInfo info = new LsfJobInfo();
                     info.setJobId(parseInt(jobIdStr));
                     info.setName(name);
                     info.setFromHost(fromHost);
                     info.setExecHost(execHost);
-                    info.setStatus(JobStatus.parse(stat));
+                    info.setStatusString(stat);
                     info.setQueue(queue);
                     info.setProject(project);
                     info.setReqSlot(parseInt(reqSlot));
@@ -181,7 +182,7 @@ public class LsfJobsCommand {
         LsfJobsCommand commands = new LsfJobsCommand();
         
         try {
-            List<JobInfo> jobs = commands.run("jacs");
+            List<JobInfo> jobs = commands.execute("jacs");
             log.info("Found {} jobs", jobs.size());
             for (JobInfo jobInfo : jobs) {
                 log.info("{}", jobInfo);

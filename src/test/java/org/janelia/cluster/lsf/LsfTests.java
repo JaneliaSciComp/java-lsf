@@ -1,4 +1,4 @@
-package org.janelia.lsf;
+package org.janelia.cluster.lsf;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -7,13 +7,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.janelia.cluster.JobInfo;
+import org.janelia.cluster.JobTemplate;
+import org.janelia.cluster.Utils;
+import org.janelia.cluster.lsf.LsfJobsCommand;
+import org.janelia.cluster.lsf.LsfSubCommand;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Multimap;
 
 public class LsfTests {
+    
+    private static final Logger log = LoggerFactory.getLogger(LsfTests.class);
     
     private LsfSubCommand subCmd = new LsfSubCommand();
     private LsfJobsCommand jobsCmd = new LsfJobsCommand();
@@ -50,7 +59,7 @@ public class LsfTests {
         jt.setErrorPath(outputDirPath+"/err.1");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
         
-        JobInfo job = subCmd.runJob(jt);
+        JobInfo job = subCmd.execute(jt);
 
         Assert.assertNotNull(job.getJobId());
 
@@ -58,7 +67,7 @@ public class LsfTests {
         
         while (true) {
 
-            List<JobInfo> jobs = jobsCmd.run();
+            List<JobInfo> jobs = jobsCmd.execute();
             Assert.assertNotNull(jobs);
             Assert.assertTrue(jobs.size()>=1);
             
@@ -83,7 +92,7 @@ public class LsfTests {
                 Thread.sleep(5000);
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Sleep interrupted", e);
             }
         }
         
@@ -94,7 +103,7 @@ public class LsfTests {
     }
     
     @Test
-    public void testBatchSub() throws IOException {
+    public void testArraySub() throws IOException {
 
         String scriptPath = scriptDirPath.resolve("test.sh").toString();
         
@@ -107,7 +116,7 @@ public class LsfTests {
         jt.setErrorPath(outputDirPath+"/err.#");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
         
-        JobInfo job = subCmd.runJobs(jt, 1, 4);
+        JobInfo job = subCmd.execute(jt, 1, 4);
 
         Assert.assertNotNull(job.getJobId());
 
@@ -115,7 +124,7 @@ public class LsfTests {
         
         while (true) {
 
-            List<JobInfo> jobs = jobsCmd.run();
+            List<JobInfo> jobs = jobsCmd.execute();
             Assert.assertNotNull(jobs);
             Assert.assertTrue(jobs.size()>1);
             
@@ -140,7 +149,7 @@ public class LsfTests {
                 Thread.sleep(5000);
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Sleep interrupted", e);
             }
         }
         

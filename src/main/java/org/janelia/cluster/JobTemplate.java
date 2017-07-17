@@ -1,9 +1,12 @@
-package org.janelia.lsf;
+package org.janelia.cluster;
 
 import java.util.List;
 
 /**
- * A template for a job to execute on the cluster.
+ * A generic template for a job to execute on the cluster.
+ * 
+ * When the job is intended to run as job array with multiple inputs, the inputPath, outputPath, and errorPaths 
+ * should contain a pound sign (#) to indicate the array index which will change with each individual job.  
  * 
  * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>
  */

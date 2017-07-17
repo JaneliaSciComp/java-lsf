@@ -1,11 +1,11 @@
-package org.janelia.lsf;
+package org.janelia.cluster;
 
 import java.time.LocalDateTime;
 
 /**
- * Job info reported from LSF. 
+ * Job info reported by the cluster implementation. 
  * 
- * For batch jobs, each job in a batch is reported separately, and the arrayIndex is populated with the
+ * For job arrays, each individual job is reported separately, and the arrayIndex is populated with the
  * sub-job's array index. 
  * 
  * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>

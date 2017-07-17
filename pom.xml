@@ -8,6 +8,10 @@
 	<name>Java LSF API</name>
 	<description>API for using bsub/bjobs from Java</description>
 
+    <properties>
+        <runSuite>**/MockTestSuite.class</runSuite>
+    </properties>
+    
 	<dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -51,9 +55,18 @@
 			<version>2.8.47</version>
 		</dependency>
 	</dependencies>
-
+	
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>${runSuite}</include>
+					</includes>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

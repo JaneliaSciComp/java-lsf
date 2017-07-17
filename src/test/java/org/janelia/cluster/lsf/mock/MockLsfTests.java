@@ -1,6 +1,7 @@
-package org.janelia.lsf;
+package org.janelia.cluster.lsf.mock;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -9,14 +10,26 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.janelia.cluster.JobInfo;
+import org.janelia.cluster.JobStatus;
+import org.janelia.cluster.JobTemplate;
+import org.janelia.cluster.Utils;
+import org.janelia.cluster.lsf.LsfJobsCommand;
+import org.janelia.cluster.lsf.LsfSubCommand;
+import org.janelia.cluster.lsf.LsfTests;
+import org.janelia.cluster.lsf.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Multimap;
 
-public class LsfTestsMocking {
+public class MockLsfTests {
+
+    private static final Logger log = LoggerFactory.getLogger(LsfTests.class);
     
     private static LsfSubCommand subCmd;
     private static LsfJobsCommand jobsCmd;
@@ -59,17 +72,17 @@ public class LsfTestsMocking {
         jt.setErrorPath(outputDirPath+"/err.1");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
         
-        JobInfo info = new JobInfo();
-        info.setJobId(10000);
-        when(subCmd.runJob(jt)).thenReturn(info);
+        Integer jobId = 1;
         
-        JobInfo info1 = new JobInfo();
-        info1.setJobId(10000);
-        info1.setStatus(JobStatus.DONE);
-        info1.setExitCode(0);
-        when(jobsCmd.run()).thenReturn(Arrays.asList(info)).thenReturn(Arrays.asList(info1));
+        when(subCmd.execute(jt))
+            .thenReturn(TestUtils.newInfo(jobId, JobStatus.PENDING));
         
-        JobInfo job = subCmd.runJob(jt);
+        when(jobsCmd.execute())
+            .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.PENDING)))
+            .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.RUNNING, 0)))
+            .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.DONE, 0)));
+        
+        JobInfo job = subCmd.execute(jt);
 
         Assert.assertNotNull(job.getJobId());
 
@@ -77,7 +90,7 @@ public class LsfTestsMocking {
         
         while (true) {
 
-            List<JobInfo> jobs = jobsCmd.run();
+            List<JobInfo> jobs = jobsCmd.execute();
             Assert.assertNotNull(jobs);
             Assert.assertTrue(jobs.size()>=1);
             
@@ -99,10 +112,10 @@ public class LsfTestsMocking {
             if (allDone) break;
             
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Sleep interrupted", e);
             }
         }
         
@@ -110,7 +123,7 @@ public class LsfTestsMocking {
     }
     
     @Test
-    public void testBatchSub() throws IOException {
+    public void testArraySub() throws IOException {
 
         String scriptPath = scriptDirPath.resolve("test.sh").toString();
         
@@ -122,34 +135,33 @@ public class LsfTestsMocking {
         jt.setOutputPath(outputDirPath+"/out.#");
         jt.setErrorPath(outputDirPath+"/err.#");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
+
+        Integer jobId = 12345;
         
-        JobInfo info = new JobInfo();
-        info.setJobId(10000);
-        when(subCmd.runJobs(jt, 1, 4)).thenReturn(info);
+        when(subCmd.execute(jt, 1, 4))
+            .thenReturn(TestUtils.newInfo(jobId, JobStatus.PENDING));
         
-        JobInfo info1 = new JobInfo();
-        info1.setJobId(10000);
-        info1.setArrayIndex(1);
-        info1.setStatus(JobStatus.DONE);
-        info1.setExitCode(0);
-        JobInfo info2 = new JobInfo();
-        info2.setJobId(10000);
-        info2.setArrayIndex(2);
-        info2.setStatus(JobStatus.DONE);
-        info2.setExitCode(0);
-        JobInfo info3 = new JobInfo();
-        info3.setJobId(10000);
-        info3.setArrayIndex(3);
-        info3.setStatus(JobStatus.DONE);
-        info3.setExitCode(0);
-        JobInfo info4 = new JobInfo();
-        info4.setJobId(10000);
-        info4.setArrayIndex(4);
-        info4.setStatus(JobStatus.DONE);
-        info4.setExitCode(0);
-        when(jobsCmd.run()).thenReturn(Arrays.asList(info)).thenReturn(Arrays.asList(info1, info2, info3, info4));
+        when(jobsCmd.execute())
+            .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.PENDING)))
+            .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.RUNNING, 0)))
+            .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.DONE, 0)));
         
-        JobInfo job = subCmd.runJobs(jt, 1, 4);
+
+        JobInfo info1 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 1);
+        JobInfo info2 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 2);
+        JobInfo info3 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 3);
+        JobInfo info4 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 4);
+        
+        JobInfo info1Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 1);
+        JobInfo info2Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 2);
+        JobInfo info3Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 3);
+        JobInfo info4Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 4);
+        
+        when(jobsCmd.execute())
+            .thenReturn(Arrays.asList(info1, info2, info3, info4))
+            .thenReturn(Arrays.asList(info1Done, info2Done, info3Done, info4Done));
+        
+        JobInfo job = subCmd.execute(jt, 1, 4);
 
         Assert.assertNotNull(job.getJobId());
 
@@ -157,7 +169,7 @@ public class LsfTestsMocking {
         
         while (true) {
 
-            List<JobInfo> jobs = jobsCmd.run();
+            List<JobInfo> jobs = jobsCmd.execute();
             Assert.assertNotNull(jobs);
             
             Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
@@ -178,10 +190,10 @@ public class LsfTestsMocking {
             if (allDone) break;
             
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Sleep interrupted", e);
             }
         }
         

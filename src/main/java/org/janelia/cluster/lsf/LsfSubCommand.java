@@ -1,4 +1,4 @@
-package org.janelia.lsf;
+package org.janelia.cluster.lsf;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.janelia.cluster.JobInfo;
+import org.janelia.cluster.JobStatus;
+import org.janelia.cluster.JobTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +30,11 @@ public class LsfSubCommand {
     private static final String BSUB_COMMAND = "bsub";
     private static final Pattern SUCCESS_PATTERN = Pattern.compile("Job <(\\d+)> is submitted to default queue <(.+)>.");
 
-    public JobInfo runJob(JobTemplate jt) throws IOException {
-        return runJobs(jt, null, null);
+    public JobInfo execute(JobTemplate jt) throws IOException {
+        return execute(jt, null, null);
     }
     
-    public JobInfo runJobs(JobTemplate jt, Integer start, Integer end) throws IOException {
+    public JobInfo execute(JobTemplate jt, Integer start, Integer end) throws IOException {
 
         List<String> cmd = new ArrayList<>();
         cmd.add(BSUB_COMMAND);
@@ -89,6 +92,7 @@ public class LsfSubCommand {
                     info = new JobInfo();
                     info.setJobId(jobId);
                     info.setQueue(queue);
+                    info.setStatus(JobStatus.PENDING);
                     break;
                 }
             }
@@ -126,7 +130,7 @@ public class LsfSubCommand {
             jt.setErrorPath(outputDirPath+"/err.#");
             jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
             
-            JobInfo job = commands.runJobs(jt, 1, 4);
+            JobInfo job = commands.execute(jt, 1, 4);
             log.info("Submitted job as {}", job.getJobId());
         }
         catch (IOException e) {
