@@ -28,6 +28,9 @@ public class JobInfo {
     private String maxMem;
     private Integer exitCode;
     
+    /**
+     * Job identifier for the job or job array.
+     */
     public Integer getJobId() {
         return jobId;
     }
@@ -36,6 +39,9 @@ public class JobInfo {
         this.jobId = jobId;
     }
 
+    /**
+     * Index of the job, if its part of a job array. Null otherwise.
+     */
     public Integer getArrayIndex() {
         return arrayIndex;
     }
@@ -44,6 +50,9 @@ public class JobInfo {
         this.arrayIndex = arrayIndex;
     }
 
+    /**
+     * Job name, as defined by the user during job submission.
+     */
     public String getName() {
         return name;
     }
@@ -52,6 +61,9 @@ public class JobInfo {
         this.name = name;
     }
 
+    /**
+     * Hostname of the submitting host.
+     */
     public String getFromHost() {
         return fromHost;
     }
@@ -60,6 +72,9 @@ public class JobInfo {
         this.fromHost = fromHost;
     }
 
+    /**
+     * Hostname of the host on which the job is executing.
+     */
     public String getExecHost() {
         return execHost;
     }
@@ -68,6 +83,9 @@ public class JobInfo {
         this.execHost = execHost;
     }
 
+    /**
+     * Last known status of the job.
+     */
     public JobStatus getStatus() {
         return status;
     }
@@ -76,6 +94,9 @@ public class JobInfo {
         this.status = status;
     }
 
+    /**
+     * Queue where the job will run, or ran.
+     */
     public String getQueue() {
         return queue;
     }
@@ -84,6 +105,9 @@ public class JobInfo {
         this.queue = queue;
     }
 
+    /**
+     * Project associated with the job.
+     */
     public String getProject() {
         return project;
     }
@@ -92,6 +116,9 @@ public class JobInfo {
         this.project = project;
     }
 
+    /**
+     * Number of slots requested for the job.
+     */
     public Integer getReqSlot() {
         return reqSlot;
     }
@@ -100,6 +127,9 @@ public class JobInfo {
         this.reqSlot = reqSlot;
     }
 
+    /**
+     * Number of slots that were allocated for the job.
+     */
     public Integer getAllocSlot() {
         return allocSlot;
     }
@@ -108,6 +138,9 @@ public class JobInfo {
         this.allocSlot = allocSlot;
     }
 
+    /**
+     * Local time at which the job was submitted.
+     */
     public LocalDateTime getSubmitTime() {
         return submitTime;
     }
@@ -116,6 +149,9 @@ public class JobInfo {
         this.submitTime = submitTime;
     }
 
+    /**
+     * Local time at which the job started running. Null if the job is pending.
+     */
     public LocalDateTime getStartTime() {
         return startTime;
     }
@@ -124,6 +160,9 @@ public class JobInfo {
         this.startTime = startTime;
     }
 
+    /**
+     * Local time at which the job finished running. Null if the job is pending or running.
+     */
     public LocalDateTime getFinishTime() {
         return finishTime;
     }
@@ -132,6 +171,9 @@ public class JobInfo {
         this.finishTime = finishTime;
     }
 
+    /**
+     * Maximum amount of memory used by the job during its execution.
+     */
     public String getMaxMem() {
         return maxMem;
     }
@@ -140,12 +182,29 @@ public class JobInfo {
         this.maxMem = maxMem;
     }
 
+    /**
+     * Final exit code of the job. Null if the job has not finished.
+     */
     public Integer getExitCode() {
         return exitCode;
     }
 
     public void setExitCode(Integer exitCode) {
         this.exitCode = exitCode;
+    }
+
+    /**
+     * Returns true if the job has started executing.
+     */
+    public boolean isStarted() {
+        return status!=null && status.isStarted();
+    }
+    
+    /**
+     * Returns true if the job is has finished executing.
+     */
+    public boolean isComplete() {
+        return status!=null && status.isDone();
     }
 
     @Override
@@ -155,13 +214,4 @@ public class JobInfo {
                 + ", reqSlot=" + reqSlot + ", allocSlot=" + allocSlot + ", submitTime=" + submitTime + ", startTime="
                 + startTime + ", finishTime=" + finishTime + ", maxMem=" + maxMem + ", exitCode=" + exitCode + "]";
     }
-
-    public boolean isStarted() {
-        return status!=null && status.isStarted();
-    }
-    
-    public boolean isComplete() {
-        return status!=null && status.isDone();
-    }
-
 }

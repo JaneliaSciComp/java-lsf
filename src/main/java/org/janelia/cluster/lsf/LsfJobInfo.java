@@ -5,6 +5,11 @@ import org.janelia.cluster.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * LSF-specific job info from bjobs.
+ *
+ * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>
+ */
 public class LsfJobInfo extends JobInfo {
 
     private String statusString;
