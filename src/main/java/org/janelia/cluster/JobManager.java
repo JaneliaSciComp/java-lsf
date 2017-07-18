@@ -176,13 +176,17 @@ public class JobManager {
 
     private void checkJobs() {
 
+        // Ensure we only run one check at at time
         if (!checkRunning.compareAndSet(false, true)) {
-            log.debug("Job check already running");
+            log.trace("Job check already running");
             return;
         }
 
         try {
-            log.debug("Checking for jobs");
+            // Are there any jobs to monitor? 
+            if (jobMetadataMap.isEmpty()) return;
+                    
+            log.trace("Checking for jobs");
             try {
                 // Query cluster for new job info
                 List<JobInfo> jobs = jobSyncApi.getJobInfo();
@@ -214,7 +218,7 @@ public class JobManager {
                             // Complete the future, if all jobs in the job array are done
                             if (allDone) {
                                 log.debug("Job {} has completed", jobId);
-                                currMetadata.getFuture().put(newInfos);
+                                currMetadata.getFuture().complete(newInfos);
                             }
                             else {
                                 log.debug("Updating running job {} with {} updated infos", jobId, newInfos.size());
@@ -225,6 +229,8 @@ public class JobManager {
                             if (Utils.getDateDiff(currMetadata.getLastUpdated(), now, TimeUnit.MINUTES) > keepZombiesMinutes) {
                                 log.debug("Removing zombie job: {}", jobId);
                                 jobMetadataMap.remove(jobId);
+                                Exception e = new Exception("Job "+jobId+" was identified as a zombie and removed");
+                                currMetadata.getFuture().completeExceptionally(e);
                             }
                         }
                     }
