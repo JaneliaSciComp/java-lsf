@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
  */
 public class LsfJobInfo extends JobInfo {
 
+    private static final Logger log = LoggerFactory.getLogger(LsfJobInfo.class);
+    
     private String lsfJobName;
     private String lsfJobStatus;
 
@@ -24,11 +26,20 @@ public class LsfJobInfo extends JobInfo {
 
     public void setLsfJobName(String lsfJobName) {
         this.lsfJobName = lsfJobName;
-        int b1 = lsfJobName.indexOf('[');
-        int b2 = lsfJobName.indexOf(']');
-        if (b1>0 && b2>0) {
-            setArrayIndex(LsfUtils.parseInt(lsfJobName.substring(b1+1, b2)));
-            setName(lsfJobName.substring(0, b1));
+        try {
+            int b1 = lsfJobName.indexOf('[');
+            int b2 = lsfJobName.indexOf(']');
+            if (b1>0 && b2>0 && b2==lsfJobName.length()-1) {
+                setArrayIndex(LsfUtils.parseInt(lsfJobName.substring(b1+1, b2)));
+                setName(lsfJobName.substring(0, b1));
+            }
+            else {
+                setName(lsfJobName);
+            }
+        }
+        catch (Exception e) {
+            log.warn("Problem parsing LSF job name: "+lsfJobName, e);
+            setName(lsfJobName);
         }
     }
 
@@ -73,11 +84,16 @@ public class LsfJobInfo extends JobInfo {
 
     @Override
     public void setExecHost(String execHost) {
-        if (execHost!=null) {
-            int s1 = execHost.indexOf('*');
-            if (s1>0) {
-                execHost = execHost.substring(s1+1);
+        try {
+            if (execHost!=null) {
+                int s1 = execHost.indexOf('*');
+                if (s1>0) {
+                    execHost = execHost.substring(s1+1);
+                }
             }
+        }
+        catch (Exception e) {
+            log.warn("Problem parsing LSF exec host: "+execHost, e);
         }
         super.setExecHost(execHost);
     }

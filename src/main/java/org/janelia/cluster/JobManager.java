@@ -1,5 +1,6 @@
 package org.janelia.cluster;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -116,7 +117,7 @@ public class JobManager {
 
     private JobFuture recordInfo(JobInfo info) {
         JobFuture future = new JobFuture(info.getJobId());
-        JobMetadata metadata = new JobMetadata(false, null, null, future);
+        JobMetadata metadata = new JobMetadata(false, new Date(), null, future);
         jobMetadataMap.put(info.getJobId(), metadata);
         return future;
     }
@@ -185,13 +186,24 @@ public class JobManager {
         try {
             // Are there any jobs to monitor? 
             if (jobMetadataMap.isEmpty()) return;
-                    
-            log.trace("Checking for jobs");
+            
             try {
                 // Query cluster for new job info
-                List<JobInfo> jobs = jobSyncApi.getJobInfo();
+                
+                List<JobInfo> jobs = new ArrayList<>();
+                try {
+                    jobs = jobSyncApi.getJobInfo();
+                }
+                catch (Throwable t) {
+                    // Catch any exceptions so that the code below can run and jobs can be retired 
+                    // as zombies if we can't retrieve job information for long enough
+                    log.error("Error getting job information", t);
+                }
+                
                 Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
                 Date now = new Date();
+                
+                log.info("Monitoring jobs: {}", getRunningJobIds());
                 
                 for (Map.Entry<Integer, JobMetadata> entry : jobMetadataMap.entrySet()) {
                     Integer jobId = entry.getKey();
@@ -202,7 +214,7 @@ public class JobManager {
                         
                         // But let's check to see if we've held onto this job for long enough
                         if (Utils.getDateDiff(currMetadata.getLastUpdated(), now, TimeUnit.MINUTES) > keepCompletedMinutes) {
-                            log.debug("Job {} is done and will be being removed from monitoring", jobId);
+                            log.debug("Job {} is done and will be removed from monitoring", jobId);
                             jobMetadataMap.remove(jobId);
                         }
                     }
@@ -221,20 +233,19 @@ public class JobManager {
                                 currMetadata.getFuture().complete(newInfos);
                             }
                             else {
-                                log.debug("Updating running job {} with {} updated infos", jobId, newInfos.size());
+                                log.trace("Updating running job {}", jobId);
                             }
                         }
                         else {
                             // No new info about this job means that it's a zombie
                             if (Utils.getDateDiff(currMetadata.getLastUpdated(), now, TimeUnit.MINUTES) > keepZombiesMinutes) {
-                                log.debug("Removing zombie job: {}", jobId);
+                                log.warn("Removing zombie job: {}", jobId);
                                 jobMetadataMap.remove(jobId);
                                 Exception e = new Exception("Job "+jobId+" was identified as a zombie and removed");
                                 currMetadata.getFuture().completeExceptionally(e);
                             }
                         }
                     }
-                    
                 }
     
                 // TODO: monitor other jobs that were not submitted through this manager
