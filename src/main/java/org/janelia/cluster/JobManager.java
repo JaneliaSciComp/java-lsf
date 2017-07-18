@@ -62,6 +62,7 @@ public class JobManager {
     /**
      * Clear the job map and begin monitoring the cluster after the initial check interval. 
      * Any submitted jobs will have their futures completed if they finish while the monitor is running.
+     * If the monitor is already running, calling this method does nothing.
      */
     public synchronized void start() {
         if (!started) {
@@ -71,7 +72,8 @@ public class JobManager {
     }
 
     /**
-     * Stop monitoring the cluster. Call start() to begin monitoring again.
+     * Stop monitoring the cluster. After calling stop(), the client may call start() to begin monitoring again.
+     * If the monitor is not running, calling this method does nothing.
      */
     public synchronized void stop() {
         if (started) {
@@ -81,7 +83,8 @@ public class JobManager {
     }
 
     /**
-     * Submit the job described by the given JobTemplate to the cluster. 
+     * Submit the job described by the given JobTemplate to the cluster.
+     * Also starts the job monitor, if it is not already started. 
      * @param jt job template
      * @return a future collection containing the completed JobInfo
      * @throws Exception if there is an error submitting the job
@@ -93,7 +96,8 @@ public class JobManager {
     }
 
     /**
-     * Submit a job array described by the given JobTemplate to the cluster.  
+     * Submit a job array described by the given JobTemplate to the cluster. 
+     * Also starts the job monitor, if it is not already started.
      * @param jt job array template 
      * @param start starting array index
      * @param end ending array index
@@ -138,7 +142,7 @@ public class JobManager {
     /**
      * Returns the latest JobInfos for the given job.
      * @param jobId job id
-     * @return collection of the JobInfos
+     * @return collection of the JobInfos, or null if we have no information for that job
      */
     public Collection<JobInfo> getJobInfo(Integer jobId) {
         JobMetadata metadata = jobMetadataMap.get(jobId);
@@ -152,7 +156,7 @@ public class JobManager {
      * Returns the latest JobInfo for the given job.
      * @param jobId job id
      * @param arrayIndex array index 
-     * @return JobInfo
+     * @return JobInfo, or null if we have no information for that job
      */
     public JobInfo getJobInfo(Integer jobId, Integer arrayIndex) {
         JobMetadata metadata = jobMetadataMap.get(jobId);

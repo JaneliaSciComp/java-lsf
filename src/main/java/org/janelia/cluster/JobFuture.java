@@ -20,10 +20,13 @@ public final class JobFuture implements Future<Collection<JobInfo>> {
     private final Integer jobId;
     private Collection<JobInfo> infos;
 
-    public JobFuture(Integer jobId) {
+    JobFuture(Integer jobId) {
         this.jobId = jobId;
     }
     
+    /**
+     * Returns the job id that has a future here.
+     */
     public Integer getJobId() {
         return jobId;
     }

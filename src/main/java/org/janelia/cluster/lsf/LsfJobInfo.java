@@ -6,47 +6,80 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * LSF-specific job info from bjobs.
+ * Parsing for LSF-specific job info from bjobs.
  *
  * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>
  */
 public class LsfJobInfo extends JobInfo {
 
-    private String statusString;
+    private String lsfJobName;
+    private String lsfJobStatus;
 
-    public String getStatusString() {
-        return statusString;
+    /**
+     * Returns the full LSF job name, including the array index, if any.
+     */
+    public String getLsfJobName() {
+        return lsfJobName;
     }
 
-    public void setStatusString(String statusString) {
-        this.statusString = statusString;
+    public void setLsfJobName(String lsfJobName) {
+        this.lsfJobName = lsfJobName;
+        int b1 = lsfJobName.indexOf('[');
+        int b2 = lsfJobName.indexOf(']');
+        if (b1>0 && b2>0) {
+            setArrayIndex(LsfUtils.parseInt(lsfJobName.substring(b1+1, b2)));
+            setName(lsfJobName.substring(0, b1));
+        }
+    }
+
+    /**
+     * Returns the LSF status string. 
+     * @return
+     */
+    public String getLsfJobStatus() {
+        return lsfJobStatus;
+    }
+
+    public void setLsfJobStatus(String lsfJobStatus) {
+        this.lsfJobStatus = lsfJobStatus;
         
-        if ("PEND".equals(statusString)) {
+        if ("PEND".equals(lsfJobStatus)) {
             setStatus(JobStatus.PENDING);
         }
-        else if ("RUN".equals(statusString)) {
+        else if ("RUN".equals(lsfJobStatus)) {
             setStatus(JobStatus.RUNNING);
         }
-        else if ("DONE".equals(statusString)) {
+        else if ("DONE".equals(lsfJobStatus)) {
             setStatus(JobStatus.DONE);
         }
-        else if ("EXIT".equals(statusString)) {
+        else if ("EXIT".equals(lsfJobStatus)) {
             setStatus(JobStatus.EXIT);
         }
-        else if ("PSUSP".equals(statusString)) {
+        else if ("PSUSP".equals(lsfJobStatus)) {
             setStatus(JobStatus.SUSPENDED);
         }
-        else if ("USUSP".equals(statusString)) {
+        else if ("USUSP".equals(lsfJobStatus)) {
             setStatus(JobStatus.SUSPENDED);
         }
-        else if ("SSUSP".equals(statusString)) {
+        else if ("SSUSP".equals(lsfJobStatus)) {
             setStatus(JobStatus.SUSPENDED);
         }
         else {
             setStatus(JobStatus.OTHER);
             Logger log = LoggerFactory.getLogger(JobStatus.class);
-            log.error("Unknown LSF job status: "+statusString);
+            log.error("Unknown LSF job status: "+lsfJobStatus);
         }
+    }
+
+    @Override
+    public void setExecHost(String execHost) {
+        if (execHost!=null) {
+            int s1 = execHost.indexOf('*');
+            if (s1>0) {
+                execHost = execHost.substring(s1+1);
+            }
+        }
+        super.setExecHost(execHost);
     }
     
 }

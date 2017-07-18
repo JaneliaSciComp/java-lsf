@@ -9,6 +9,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 
+/**
+ * Utility methods for dealing with jobs.
+ *
+ * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>
+ */
 public class Utils {
 
     public static Multimap<Integer, JobInfo> getJobMap(List<JobInfo> jobs) {

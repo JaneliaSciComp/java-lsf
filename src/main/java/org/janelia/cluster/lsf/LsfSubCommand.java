@@ -28,7 +28,7 @@ public class LsfSubCommand {
     private static final Logger log = LoggerFactory.getLogger(LsfSubCommand.class);
     
     private static final String BSUB_COMMAND = "bsub";
-    private static final Pattern SUCCESS_PATTERN = Pattern.compile("Job <(\\d+)> is submitted to default queue <(.+)>.");
+    private static final Pattern SUCCESS_PATTERN = Pattern.compile("Job <(\\d+)> is submitted to \\S+ queue <(.+)>.");
 
     public JobInfo execute(JobTemplate jt) throws IOException {
         return execute(jt, null, null);
@@ -80,6 +80,17 @@ public class LsfSubCommand {
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
         Process p = processBuilder.start();
+
+        int exitValue;
+        try {
+            exitValue = p.waitFor();
+            if (exitValue!=0) {
+                throw new IOException(BSUB_COMMAND+" exited with code "+p.exitValue());
+            }
+        }
+        catch (InterruptedException e) {
+            throw new IOException(BSUB_COMMAND+" did not exit cleanly", e);
+        }
         
         JobInfo info = null;
         try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
@@ -87,7 +98,7 @@ public class LsfSubCommand {
             while ((line = input.readLine()) != null) {
                 Matcher m = SUCCESS_PATTERN.matcher(line);
                 if (m.matches()) {
-                    Integer jobId = parseInt(m.group(1));
+                    Integer jobId = LsfUtils.parseInt(m.group(1));
                     String queue = m.group(2);
                     info = new JobInfo();
                     info.setJobId(jobId);
@@ -99,11 +110,6 @@ public class LsfSubCommand {
         }
         
         return info;
-    }
-
-    private Integer parseInt(String str) {
-        if (str==null) return null;
-        return new Integer(str);
     }
     
     public static void main(String[] args) throws IOException {

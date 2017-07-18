@@ -3,9 +3,6 @@ package org.janelia.cluster.lsf;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +22,6 @@ public class LsfJobsCommand {
 
     private static final Logger log = LoggerFactory.getLogger(LsfJobsCommand.class);
     
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MMM dd HH:mm yyyy");
     private static final String BJOBS_COMMAND = "bjobs";
     private static final Character BJOBS_DELIMITER = ',';
 
@@ -82,39 +78,26 @@ public class LsfJobsCommand {
                     String finishTime = getValue(split, c++);
                     String maxMem = getValue(split, c++);
                     String exitCodeStr = getValue(split, c++);
-                              
-                    if (execHost!=null) {
-                        int s1 = execHost.indexOf('*');
-                        if (s1>0) {
-                            execHost = execHost.substring(s1+1);
-                        }
-                    }
                     
                     LsfJobInfo info = new LsfJobInfo();
-                    info.setJobId(parseInt(jobIdStr));
-                    info.setName(name);
+                    info.setJobId(LsfUtils.parseInt(jobIdStr));
+                    info.setLsfJobName(name);
                     info.setFromHost(fromHost);
                     info.setExecHost(execHost);
-                    info.setStatusString(stat);
+                    info.setLsfJobStatus(stat);
                     info.setQueue(queue);
                     info.setProject(project);
-                    info.setReqSlot(parseInt(reqSlot));
-                    info.setAllocSlot(parseInt(allocSlot));
-                    info.setSubmitTime(parseDate(submitTime));
-                    info.setStartTime(parseDate(startTime));
-                    info.setFinishTime(parseDate(finishTime));
+                    info.setReqSlot(LsfUtils.parseInt(reqSlot));
+                    info.setAllocSlot(LsfUtils.parseInt(allocSlot));
+                    info.setSubmitTime(LsfUtils.parseDate(submitTime));
+                    info.setStartTime(LsfUtils.parseDate(startTime));
+                    info.setFinishTime(LsfUtils.parseDate(finishTime));
                     info.setMaxMem(maxMem);
                     
                     // LSF does not give an exit code unless it is non-zero
-                    Integer exitCode = parseInt(exitCodeStr);
+                    Integer exitCode = LsfUtils.parseInt(exitCodeStr);
                     if (exitCode==null && info.getStatus().isDone()) exitCode = 0;
                     info.setExitCode(exitCode);
-    
-                    int b1 = name.indexOf('[');
-                    int b2 = name.indexOf(']');
-                    if (b1>0 && b2>0) {
-                        info.setArrayIndex(parseInt(name.substring(b1+1, b2)));
-                    }
 
                     return info;
                 }
@@ -137,19 +120,6 @@ public class LsfJobsCommand {
             return null;
         }
     }
-    
-    private Integer parseInt(String str) {
-        if (str==null) return null;
-        return new Integer(str);
-    }
-    
-    private LocalDateTime parseDate(String str) throws ParseException {
-        if (str==null) return null;
-        // Remove the E for Estimated and other such characters from the end of dates.
-        // Add the year because LSF is saving valuable space by not sending it. Things will get interesting on Jan 1st. 
-        String dateStr = str.replaceAll("( \\w)$", "") + " " + LocalDateTime.now().getYear();
-        return LocalDateTime.parse(dateStr, DATE_FORMAT);
-    }
 
     private List<JobInfo> runJobsCommand(List<String> args, Function<String,JobInfo> parser) throws IOException {
 
@@ -162,6 +132,17 @@ public class LsfJobsCommand {
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
         Process p = processBuilder.start();
+        
+        int exitValue;
+        try {
+            exitValue = p.waitFor();
+            if (exitValue!=0) {
+                throw new IOException(BJOBS_COMMAND+" exited with code "+p.exitValue());
+            }
+        }
+        catch (InterruptedException e) {
+            throw new IOException(BJOBS_COMMAND+" did not exit cleanly", e);
+        }
         
         List<JobInfo> statusList = new ArrayList<>();
         try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
@@ -182,7 +163,7 @@ public class LsfJobsCommand {
         LsfJobsCommand commands = new LsfJobsCommand();
         
         try {
-            List<JobInfo> jobs = commands.execute("jacs");
+            List<JobInfo> jobs = commands.execute();
             log.info("Found {} jobs", jobs.size());
             for (JobInfo jobInfo : jobs) {
                 log.info("{}", jobInfo);
