@@ -163,6 +163,7 @@ public class MockLsfTests {
         
         JobInfo job = subCmd.execute(jt, 1, 4);
 
+        Assert.assertNotNull(job);
         Assert.assertNotNull(job.getJobId());
 
         boolean hadErrors = false;

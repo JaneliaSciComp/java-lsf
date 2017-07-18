@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -66,8 +65,10 @@ public class JobManager {
      */
     public synchronized void start() {
         if (!started) {
+            log.debug("Starting job monitoring");
             jobMetadataMap.clear();
             jobChecker = scheduler.scheduleAtFixedRate(() -> checkJobs(), checkIntervalSeconds, checkIntervalSeconds, TimeUnit.SECONDS);
+            this.started = true;
         }
     }
 
@@ -77,6 +78,7 @@ public class JobManager {
      */
     public synchronized void stop() {
         if (started) {
+            log.debug("Stopping job monitoring");
             jobChecker.cancel(true);
             started = false;
         }
@@ -92,6 +94,7 @@ public class JobManager {
     public JobFuture submitJob(JobTemplate jt) throws Exception {
         start();
         JobInfo info = jobSyncApi.submitJob(jt);
+        log.debug("Submitted job {}", info.getJobId());
         return recordInfo(info);
     }
 
@@ -104,9 +107,10 @@ public class JobManager {
      * @return a future collection containing the completed JobInfos
      * @throws Exception if there is an error submitting the jobs
      */
-    public Future<Collection<JobInfo>> submitJob(JobTemplate jt, int start, int end) throws Exception {
+    public JobFuture submitJob(JobTemplate jt, int start, int end) throws Exception {
         start();
         JobInfo info = jobSyncApi.submitJobs(jt, start, end);
+        log.debug("Submitted job array {} ({}-{})", info.getJobId(), start, end);
         return recordInfo(info);
     }
 
@@ -173,12 +177,12 @@ public class JobManager {
     private void checkJobs() {
 
         if (!checkRunning.compareAndSet(false, true)) {
-            log.info("Job check already running");
+            log.debug("Job check already running");
             return;
         }
 
         try {
-            log.info("Checking for jobs");
+            log.debug("Checking for jobs");
             try {
                 // Query cluster for new job info
                 List<JobInfo> jobs = jobSyncApi.getJobInfo();
@@ -194,7 +198,7 @@ public class JobManager {
                         
                         // But let's check to see if we've held onto this job for long enough
                         if (Utils.getDateDiff(currMetadata.getLastUpdated(), now, TimeUnit.MINUTES) > keepCompletedMinutes) {
-                            log.info("Removing finished job: {}", jobId);
+                            log.debug("Job {} is done and will be being removed from monitoring", jobId);
                             jobMetadataMap.remove(jobId);
                         }
                     }
@@ -209,17 +213,17 @@ public class JobManager {
                             
                             // Complete the future, if all jobs in the job array are done
                             if (allDone) {
-                                log.info("Marking job as completed: {}", jobId);
+                                log.debug("Job {} has completed", jobId);
                                 currMetadata.getFuture().put(newInfos);
                             }
                             else {
-                                log.info("Updating running job {} with {} updated infos", jobId, newInfos.size());
+                                log.debug("Updating running job {} with {} updated infos", jobId, newInfos.size());
                             }
                         }
                         else {
                             // No new info about this job means that it's a zombie
                             if (Utils.getDateDiff(currMetadata.getLastUpdated(), now, TimeUnit.MINUTES) > keepZombiesMinutes) {
-                                log.info("Removing zombie job: {}", jobId);
+                                log.debug("Removing zombie job: {}", jobId);
                                 jobMetadataMap.remove(jobId);
                             }
                         }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.janelia</groupId>
     <artifactId>java-lsf</artifactId>
-    <version>0.0.1</version>
+    <version>0.1.0</version>
     <name>Java LSF API</name>
     <description>API for managing LSF cluster jobs from Java</description>
 
@@ -16,17 +16,17 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>0.9.30</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>0.9.30</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.2</version>
+            <version>1.7.25</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
