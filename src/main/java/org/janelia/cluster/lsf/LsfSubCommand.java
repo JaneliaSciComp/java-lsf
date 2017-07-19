@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,17 +81,6 @@ public class LsfSubCommand {
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
         Process p = processBuilder.start();
-
-        int exitValue;
-        try {
-            exitValue = p.waitFor();
-            if (exitValue!=0) {
-                throw new IOException(BSUB_COMMAND+" exited with code "+p.exitValue());
-            }
-        }
-        catch (InterruptedException e) {
-            throw new IOException(BSUB_COMMAND+" did not exit cleanly", e);
-        }
         
         JobInfo info = null;
         try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
@@ -107,6 +97,20 @@ public class LsfSubCommand {
                     break;
                 }
             }
+        }
+
+        int exitValue;
+        try {
+            log.trace("Waiting for exit...");
+            p.waitFor(30, TimeUnit.SECONDS);
+            exitValue = p.exitValue();
+            log.trace("exitValue: "+exitValue);
+            if (exitValue!=0) {
+                throw new IOException(BSUB_COMMAND+" exited with code "+exitValue);
+            }
+        }
+        catch (InterruptedException e) {
+            throw new IOException(BSUB_COMMAND+" did not exit cleanly", e);
         }
         
         return info;

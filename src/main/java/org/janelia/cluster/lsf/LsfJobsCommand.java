@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.janelia.cluster.JobInfo;
@@ -23,7 +24,7 @@ public class LsfJobsCommand {
     private static final Logger log = LoggerFactory.getLogger(LsfJobsCommand.class);
     
     private static final String BJOBS_COMMAND = "bjobs";
-    private static final Character BJOBS_DELIMITER = ',';
+    private static final Character BJOBS_DELIMITER = '^';
 
     public List<JobInfo> execute() throws IOException {
         return execute(null);
@@ -55,12 +56,12 @@ public class LsfJobsCommand {
                     return null;
                 }
                 
-                if ("No job found".equals(line)) {
+                if (line.matches("No .* found")) {
                     return null;
                 }
                 
                 try {
-                    String[] split = line.split(BJOBS_DELIMITER.toString());
+                    String[] split = line.split("\\"+BJOBS_DELIMITER);
                     log.trace("Parsed '{}' into {} values", line, split.length);
                     
                     int c = 0;
@@ -133,26 +134,31 @@ public class LsfJobsCommand {
         processBuilder.redirectErrorStream(true);
         Process p = processBuilder.start();
         
-        int exitValue;
-        try {
-            exitValue = p.waitFor();
-            if (exitValue!=0) {
-                throw new IOException(BJOBS_COMMAND+" exited with code "+p.exitValue());
-            }
-        }
-        catch (InterruptedException e) {
-            throw new IOException(BJOBS_COMMAND+" did not exit cleanly", e);
-        }
         
         List<JobInfo> statusList = new ArrayList<>();
         try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
             String line;
             while ((line = input.readLine()) != null) {
+                log.trace("Output: "+line);
                 JobInfo info = parser.apply(line);
                 if (info!=null) {
                     statusList.add(info);
                 }
             }
+        }
+
+        int exitValue;
+        try {
+            log.trace("Waiting for exit...");
+            p.waitFor(30, TimeUnit.SECONDS);
+            exitValue = p.exitValue();
+            log.trace("exitValue: "+exitValue);
+            if (exitValue!=0) {
+                throw new IOException(BJOBS_COMMAND+" exited with code "+exitValue);
+            }
+        }
+        catch (InterruptedException e) {
+            throw new IOException(BJOBS_COMMAND+" did not exit cleanly", e);
         }
         
         return statusList;
