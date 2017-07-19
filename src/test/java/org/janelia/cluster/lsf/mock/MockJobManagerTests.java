@@ -1,21 +1,7 @@
 package org.janelia.cluster.lsf.mock;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
-import org.janelia.cluster.JobFuture;
-import org.janelia.cluster.JobInfo;
-import org.janelia.cluster.JobManager;
-import org.janelia.cluster.JobStatus;
-import org.janelia.cluster.JobSyncApi;
-import org.janelia.cluster.JobTemplate;
+import org.janelia.cluster.*;
 import org.janelia.cluster.lsf.LsfJobsCommand;
 import org.janelia.cluster.lsf.LsfSubCommand;
 import org.janelia.cluster.lsf.TestUtils;
@@ -24,6 +10,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class MockJobManagerTests {
 
     private LsfSubCommand subCmd;
@@ -31,6 +26,7 @@ public class MockJobManagerTests {
     private JobSyncApi syncApi;
     
     private JobManager mgr;
+    private JobMonitor monitor;
     private Path rootPath;
     private Path inputDirPath;
     private Path scriptDirPath;
@@ -79,13 +75,14 @@ public class MockJobManagerTests {
     
     @Before 
     public void createManager() throws IOException {
-        this.mgr = new JobManager(createSyncApi(), 1, 1, 0);
-        mgr.start();
+        this.mgr = new JobManager(createSyncApi(), 1, 0);
+        this.monitor = new JobMonitor(mgr, 1);
+        monitor.start();
     }
 
     @After
     public void destroyManager() {
-        this.mgr.stop();
+        this.monitor.stop();
     }
 
     @Test

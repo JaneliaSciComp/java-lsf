@@ -1,24 +1,21 @@
 package org.janelia.cluster.lsf;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Multimap;
 import org.apache.commons.io.FileUtils;
 import org.janelia.cluster.JobInfo;
 import org.janelia.cluster.JobTemplate;
 import org.janelia.cluster.Utils;
-import org.janelia.cluster.lsf.LsfJobsCommand;
-import org.janelia.cluster.lsf.LsfSubCommand;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Multimap;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 public class LsfTests {
     

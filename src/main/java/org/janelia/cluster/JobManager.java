@@ -1,22 +1,14 @@
 package org.janelia.cluster;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Multimap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * Manager for submitting and monitoring cluster jobs. During construction, a concrete JobSyncApi implementation 
@@ -31,77 +23,42 @@ public class JobManager {
     private static final Logger log = LoggerFactory.getLogger(JobManager.class);
 
     // Constants
-    private static final int DEFAULT_CHECK_INTERVAL_SECONDS = 15;
     private static final int DEFAULT_KEEP_COMPLETED_MINUTES = 10;
     private static final int DEFAULT_KEEP_ZOMBIES_MINUTES = 30;
 
     // Configuration
     private final JobSyncApi jobSyncApi;
-    private final int checkIntervalSeconds;
     private final int keepCompletedMinutes;
     private final int keepZombiesMinutes;
 
     // State
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final AtomicBoolean checkRunning = new AtomicBoolean();
     private final ConcurrentHashMap<Integer, JobMetadata> jobMetadataMap = new ConcurrentHashMap<>();
-    private ScheduledFuture<?> jobChecker;
-    private boolean started = false;
 
     public JobManager(JobSyncApi jobSyncApi) {
-        this(jobSyncApi, DEFAULT_CHECK_INTERVAL_SECONDS, DEFAULT_KEEP_COMPLETED_MINUTES, DEFAULT_KEEP_ZOMBIES_MINUTES);
+        this(jobSyncApi, DEFAULT_KEEP_COMPLETED_MINUTES, DEFAULT_KEEP_ZOMBIES_MINUTES);
     }
 
-    public JobManager(JobSyncApi jobSyncApi, int checkIntervalSeconds, int keepCompletedMinutes, int keepZombiesMinutes) {
+    public JobManager(JobSyncApi jobSyncApi, int keepCompletedMinutes, int keepZombiesMinutes) {
         this.jobSyncApi = jobSyncApi;
-        this.checkIntervalSeconds = checkIntervalSeconds;
         this.keepCompletedMinutes = keepCompletedMinutes;
         this.keepZombiesMinutes = keepZombiesMinutes;
     }
 
     /**
-     * Clear the job map and begin monitoring the cluster after the initial check interval. 
-     * Any submitted jobs will have their futures completed if they finish while the monitor is running.
-     * If the monitor is already running, calling this method does nothing.
-     */
-    public synchronized void start() {
-        if (!started) {
-            log.debug("Starting job monitoring");
-            jobMetadataMap.clear();
-            jobChecker = scheduler.scheduleAtFixedRate(() -> checkJobs(), checkIntervalSeconds, checkIntervalSeconds, TimeUnit.SECONDS);
-            this.started = true;
-        }
-    }
-
-    /**
-     * Stop monitoring the cluster. After calling stop(), the client may call start() to begin monitoring again.
-     * If the monitor is not running, calling this method does nothing.
-     */
-    public synchronized void stop() {
-        if (started) {
-            log.debug("Stopping job monitoring");
-            jobChecker.cancel(true);
-            started = false;
-        }
-    }
-
-    /**
      * Submit the job described by the given JobTemplate to the cluster.
-     * Also starts the job monitor, if it is not already started. 
      * @param jt job template
      * @return a future collection containing the completed JobInfo
      * @throws Exception if there is an error submitting the job
      */
     public JobFuture submitJob(JobTemplate jt) throws Exception {
-        start();
         JobInfo info = jobSyncApi.submitJob(jt);
         log.debug("Submitted job {}", info.getJobId());
         return recordInfo(info);
     }
 
     /**
-     * Submit a job array described by the given JobTemplate to the cluster. 
-     * Also starts the job monitor, if it is not already started.
+     * Submit a job array described by the given JobTemplate to the cluster.
      * @param jt job array template 
      * @param start starting array index
      * @param end ending array index
@@ -109,7 +66,6 @@ public class JobManager {
      * @throws Exception if there is an error submitting the jobs
      */
     public JobFuture submitJob(JobTemplate jt, int start, int end) throws Exception {
-        start();
         JobInfo info = jobSyncApi.submitJobs(jt, start, end);
         log.debug("Submitted job array {} ({}-{})", info.getJobId(), start, end);
         return recordInfo(info);
@@ -175,7 +131,32 @@ public class JobManager {
         return null;
     }
 
-    private void checkJobs() {
+    /**
+     * Reset this manager instance. If there are currently running jobs, their futures will all throw exceptions.
+     */
+    public void clear() {
+        log.trace("Resetting job metadata map");
+        if (!jobMetadataMap.isEmpty()) {
+
+            // Make sure all job futures are completed
+            for (Map.Entry<Integer, JobMetadata> entry : jobMetadataMap.entrySet()) {
+                Integer jobId = entry.getKey();
+                JobMetadata currMetadata = entry.getValue();
+                Exception e = new Exception("Job "+jobId+" was abandoned");
+                currMetadata.getFuture().completeExceptionally(e);
+            }
+
+            jobMetadataMap.clear();
+        }
+    }
+
+    /**
+     * This method is called periodically if start() is called. You could also manually schedule this method to be
+     * called, e.g. if you are running in a manager container with designated timer threads.
+     */
+    public void checkJobs() {
+
+        log.trace("checkJobs");
 
         // Ensure we only run one check at at time
         if (!checkRunning.compareAndSet(false, true)) {
@@ -185,7 +166,10 @@ public class JobManager {
 
         try {
             // Are there any jobs to monitor? 
-            if (jobMetadataMap.isEmpty()) return;
+            if (jobMetadataMap.isEmpty()) {
+                log.trace("No jobs are being monitored");
+                return;
+            }
             
             try {
                 // Query cluster for new job info
@@ -202,8 +186,13 @@ public class JobManager {
                 
                 Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
                 Date now = new Date();
-                
-                log.info("Monitoring jobs: {}", getRunningJobIds());
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Monitoring jobs: {}", getRunningJobIds());
+                }
+                else {
+                    log.info("Monitoring {} jobs", getRunningJobIds().size());
+                }
                 
                 for (Map.Entry<Integer, JobMetadata> entry : jobMetadataMap.entrySet()) {
                     Integer jobId = entry.getKey();
@@ -258,7 +247,7 @@ public class JobManager {
             checkRunning.set(false);
         }
     }
-    
+
     private class JobMetadata {
 
         private final boolean done;
