@@ -6,7 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   MockJobManagerTests.class,
-  MockLsfTests.class
+  MockLsfTests.class,
+  ParseTests.class
 })
 public class MockTestSuite {
 

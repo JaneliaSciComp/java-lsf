@@ -15,8 +15,10 @@ public class LsfUtils {
 
     public static LocalDateTime parseDate(String str) throws ParseException {
         if (str==null) return null;
-        // Eliminate extra spaces which LSF likes to put in places for text alignment purposes. These unfortunately break the date parser.
-        str = str.replaceAll("\\s+", " ").trim();
+        // LSF puts in spaces for text alignment purposes instead of padding with zeros. These unfortunately break the
+        // date parser. The following is a relatively naive way to try to fix this, but it should work for all cases
+        // that we care about:
+        str = str.trim().replaceAll("  ", " 0");
         // Remove the E for "Estimated" and other such characters from the end of dates.
         str = str.replaceAll("( \\w)$", "");
         // Add the current year because LSF is saving valuable space by not sending it. Things will get very interesting on Jan 1st. 
