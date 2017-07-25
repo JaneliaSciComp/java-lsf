@@ -15,9 +15,12 @@ public class LsfUtils {
 
     public static LocalDateTime parseDate(String str) throws ParseException {
         if (str==null) return null;
-        // Remove the E for Estimated and other such characters from the end of dates.
+        // Eliminate extra spaces which LSF likes to put in places for text alignment purposes. These unfortunately break the date parser.
+        str = str.replaceAll("\\s+", " ").trim();
+        // Remove the E for "Estimated" and other such characters from the end of dates.
+        str = str.replaceAll("( \\w)$", "");
         // Add the current year because LSF is saving valuable space by not sending it. Things will get very interesting on Jan 1st. 
-        String dateStr = str.replaceAll("( \\w)$", "") + " " + LocalDateTime.now().getYear();
+        String dateStr = str + " " + LocalDateTime.now().getYear();
         return LocalDateTime.parse(dateStr, DATE_FORMAT);
     }
 
