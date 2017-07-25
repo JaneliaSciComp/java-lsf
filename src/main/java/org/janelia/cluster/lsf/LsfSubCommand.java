@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,9 +28,12 @@ import org.slf4j.LoggerFactory;
 public class LsfSubCommand {
 
     private static final Logger log = LoggerFactory.getLogger(LsfSubCommand.class);
-    
+
     private static final String BSUB_COMMAND = "bsub";
+    private static final String BSUB_ENV_REPORT_MAIL = "LSB_JOB_REPORT_MAIL";
     private static final Pattern SUCCESS_PATTERN = Pattern.compile("Job <(\\d+)> is submitted to \\S+ queue <(.+)>.");
+
+    private boolean isJobReportMail = false;
 
     public JobInfo execute(JobTemplate jt) throws IOException {
         return execute(jt, null, null);
@@ -80,6 +84,10 @@ public class LsfSubCommand {
         
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
+
+        Map<String, String> env = processBuilder.environment();
+        env.put(BSUB_ENV_REPORT_MAIL, isJobReportMail ? "y":"n");
+
         Process p = processBuilder.start();
         
         JobInfo info = null;
@@ -115,7 +123,23 @@ public class LsfSubCommand {
         
         return info;
     }
-    
+
+    /**
+     * If this is set to true, bsub will be called with the LSB_JOB_REPORT_MAIL=y environment variable,
+     * otherwise it will be called with LSB_JOB_REPORT_MAIL=n.
+     */
+    public boolean isJobReportMail() {
+        return isJobReportMail;
+    }
+
+    /**
+     * If this is set to true, bsub will be called with the LSB_JOB_REPORT_MAIL=y environment variable,
+     * otherwise it will be called with LSB_JOB_REPORT_MAIL=n.
+     */
+    public void setJobReportMail(boolean jobReportMail) {
+        this.isJobReportMail = jobReportMail;
+    }
+
     public static void main(String[] args) throws IOException {
         
         LsfSubCommand commands = new LsfSubCommand();
