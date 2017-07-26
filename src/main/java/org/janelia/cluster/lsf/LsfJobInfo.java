@@ -75,6 +75,9 @@ public class LsfJobInfo extends JobInfo {
         else if ("SSUSP".equals(lsfJobStatus)) {
             setStatus(JobStatus.SUSPENDED);
         }
+        else if ("UNKWN".equals(lsfJobStatus)) {
+            setStatus(JobStatus.OTHER);
+        }
         else {
             setStatus(JobStatus.OTHER);
             Logger log = LoggerFactory.getLogger(JobStatus.class);
