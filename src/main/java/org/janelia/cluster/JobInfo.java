@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  */
 public class JobInfo {
 
-    private Integer jobId;
-    private Integer arrayIndex;
+    private Long jobId;
+    private Long arrayIndex;
     private String name;
     private String fromHost;
     private String execHost;
@@ -31,22 +31,22 @@ public class JobInfo {
     /**
      * Job identifier for the job or job array.
      */
-    public Integer getJobId() {
+    public Long getJobId() {
         return jobId;
     }
 
-    public void setJobId(Integer jobId) {
+    public void setJobId(Long jobId) {
         this.jobId = jobId;
     }
 
     /**
      * Index of the job, if its part of a job array. Null otherwise.
      */
-    public Integer getArrayIndex() {
+    public Long getArrayIndex() {
         return arrayIndex;
     }
 
-    public void setArrayIndex(Integer arrayIndex) {
+    public void setArrayIndex(Long arrayIndex) {
         this.arrayIndex = arrayIndex;
     }
 

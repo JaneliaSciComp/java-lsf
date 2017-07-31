@@ -5,15 +5,15 @@ import org.janelia.cluster.JobStatus;
 
 public class TestUtils {
     
-    public static JobInfo newInfo(Integer jobId, JobStatus jobStatus) {
+    public static JobInfo newInfo(Long jobId, JobStatus jobStatus) {
         return newInfo(jobId, jobStatus, null);
     }
     
-    public static JobInfo newInfo(Integer jobId, JobStatus jobStatus, Integer exitCode) {
+    public static JobInfo newInfo(Long jobId, JobStatus jobStatus, Integer exitCode) {
         return newInfo(jobId, jobStatus, exitCode, null);
     }
 
-    public static JobInfo newInfo(Integer jobId, JobStatus jobStatus, Integer exitCode, Integer arrayIndex) {
+    public static JobInfo newInfo(Long jobId, JobStatus jobStatus, Integer exitCode, Long arrayIndex) {
         JobInfo info = new JobInfo();
         info.setJobId(jobId);
         info.setStatus(jobStatus);

@@ -16,8 +16,8 @@ import com.google.common.collect.Multimap;
  */
 public class Utils {
 
-    public static Multimap<Integer, JobInfo> getJobMap(List<JobInfo> jobs) {
-        ListMultimap<Integer, JobInfo> map = ArrayListMultimap.create();
+    public static Multimap<Long, JobInfo> getJobMap(List<JobInfo> jobs) {
+        ListMultimap<Long, JobInfo> map = ArrayListMultimap.create();
         for (JobInfo jobInfo : jobs) {
             map.put(jobInfo.getJobId(), jobInfo);
         }

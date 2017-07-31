@@ -96,7 +96,7 @@ public class LsfSubCommand {
             while ((line = input.readLine()) != null) {
                 Matcher m = SUCCESS_PATTERN.matcher(line);
                 if (m.matches()) {
-                    Integer jobId = LsfUtils.parseInt(m.group(1));
+                    Long jobId = LsfUtils.parseLong(m.group(1));
                     String queue = m.group(2);
                     info = new JobInfo();
                     info.setJobId(jobId);

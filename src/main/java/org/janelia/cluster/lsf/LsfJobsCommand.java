@@ -83,7 +83,7 @@ public class LsfJobsCommand {
                 String exitCodeStr = getValue(split, c++);
 
                 LsfJobInfo info = new LsfJobInfo();
-                info.setJobId(LsfUtils.parseInt(jobIdStr));
+                info.setJobId(LsfUtils.parseLong(jobIdStr));
                 info.setLsfJobName(name);
                 info.setFromHost(fromHost);
                 info.setExecHost(execHost);

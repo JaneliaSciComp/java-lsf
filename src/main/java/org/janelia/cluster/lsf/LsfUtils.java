@@ -30,4 +30,9 @@ public class LsfUtils {
         if (str==null) return null;
         return new Integer(str);
     }
+
+    public static Long parseLong(String str) {
+        if (str==null) return null;
+        return new Long(str);
+    }
 }

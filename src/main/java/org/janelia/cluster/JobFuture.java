@@ -13,16 +13,16 @@ import java.util.concurrent.CompletableFuture;
  */
 public final class JobFuture extends CompletableFuture<Collection<JobInfo>> {
 
-    private final Integer jobId;
+    private final Long jobId;
 
-    JobFuture(Integer jobId) {
+    JobFuture(Long jobId) {
         this.jobId = jobId;
     }
     
     /**
      * Returns the job id that has a future here.
      */
-    public Integer getJobId() {
+    public Long getJobId() {
         return jobId;
     }
 

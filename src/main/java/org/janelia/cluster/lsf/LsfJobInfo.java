@@ -30,7 +30,7 @@ public class LsfJobInfo extends JobInfo {
             int b1 = lsfJobName.indexOf('[');
             int b2 = lsfJobName.indexOf(']');
             if (b1>0 && b2>0 && b2==lsfJobName.length()-1) {
-                setArrayIndex(LsfUtils.parseInt(lsfJobName.substring(b1+1, b2)));
+                setArrayIndex(LsfUtils.parseLong(lsfJobName.substring(b1+1, b2)));
                 setName(lsfJobName.substring(0, b1));
             }
             else {

@@ -40,5 +40,9 @@ public class ParseTests {
         Assert.assertEquals(new Integer(1234), LsfUtils.parseInt("1234"));
     }
 
+    @Test
+    public void testLongParse() throws ParseException {
+        Assert.assertEquals(new Long(9999999999L), LsfUtils.parseLong("9999999999"));
+    }
 
 }

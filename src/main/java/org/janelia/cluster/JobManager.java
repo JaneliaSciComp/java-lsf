@@ -33,7 +33,7 @@ public class JobManager {
 
     // State
     private final AtomicBoolean checkRunning = new AtomicBoolean();
-    private final ConcurrentHashMap<Integer, JobMetadata> jobMetadataMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, JobMetadata> jobMetadataMap = new ConcurrentHashMap<>();
 
     public JobManager(JobSyncApi jobSyncApi) {
         this(jobSyncApi, DEFAULT_KEEP_COMPLETED_MINUTES, DEFAULT_KEEP_ZOMBIES_MINUTES);
@@ -82,7 +82,7 @@ public class JobManager {
      * Returns the job ids of any jobs which were being monitored and are now complete.
      * @return collection of job ids
      */
-    public Collection<Integer> getCompletedJobIds() {  
+    public Collection<Long> getCompletedJobIds() {
         return jobMetadataMap.entrySet().stream()
                 .filter((entry) -> entry.getValue().isDone())
                 .map(Map.Entry::getKey)
@@ -93,7 +93,7 @@ public class JobManager {
      * Returns the job ids of any jobs which are currently running and being monitored.
      * @return collection of job ids
      */
-    public Collection<Integer> getRunningJobIds() {  
+    public Collection<Long> getRunningJobIds() {
         return jobMetadataMap.entrySet().stream()
                 .filter((entry) -> !entry.getValue().isDone())
                 .map(Map.Entry::getKey)
@@ -139,8 +139,8 @@ public class JobManager {
         if (!jobMetadataMap.isEmpty()) {
 
             // Make sure all job futures are completed
-            for (Map.Entry<Integer, JobMetadata> entry : jobMetadataMap.entrySet()) {
-                Integer jobId = entry.getKey();
+            for (Map.Entry<Long, JobMetadata> entry : jobMetadataMap.entrySet()) {
+                Long jobId = entry.getKey();
                 JobMetadata currMetadata = entry.getValue();
                 Exception e = new Exception("Job "+jobId+" was abandoned");
                 currMetadata.getFuture().completeExceptionally(e);
@@ -184,7 +184,7 @@ public class JobManager {
                     log.error("Error getting job information", t);
                 }
                 
-                Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
+                Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
                 Date now = new Date();
 
                 if (log.isDebugEnabled()) {
@@ -194,8 +194,8 @@ public class JobManager {
                     log.info("Monitoring {} jobs", getRunningJobIds().size());
                 }
                 
-                for (Map.Entry<Integer, JobMetadata> entry : jobMetadataMap.entrySet()) {
-                    Integer jobId = entry.getKey();
+                for (Map.Entry<Long, JobMetadata> entry : jobMetadataMap.entrySet()) {
+                    Long jobId = entry.getKey();
                     JobMetadata currMetadata = entry.getValue();
                     
                     if (currMetadata.isDone()) {

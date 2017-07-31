@@ -68,7 +68,7 @@ public class LsfTests {
             Assert.assertNotNull(jobs);
             Assert.assertTrue(jobs.size()>=1);
             
-            Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
+            Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
             Assert.assertTrue(jobMap.containsKey(job.getJobId()));
             
             boolean allDone = true;
@@ -125,7 +125,7 @@ public class LsfTests {
             Assert.assertNotNull(jobs);
             Assert.assertTrue(jobs.size()>1);
             
-            Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
+            Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
             Assert.assertTrue(jobMap.containsKey(job.getJobId()));
             
             boolean allDone = true;

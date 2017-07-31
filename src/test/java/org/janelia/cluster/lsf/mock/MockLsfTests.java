@@ -71,8 +71,8 @@ public class MockLsfTests {
         jt.setOutputPath(outputDirPath+"/out.1");
         jt.setErrorPath(outputDirPath+"/err.1");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
-        
-        Integer jobId = 1;
+
+        Long jobId = 1L;
         
         when(subCmd.execute(jt))
             .thenReturn(TestUtils.newInfo(jobId, JobStatus.PENDING));
@@ -94,7 +94,7 @@ public class MockLsfTests {
             Assert.assertNotNull(jobs);
             Assert.assertTrue(jobs.size()>=1);
             
-            Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
+            Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
             Assert.assertTrue(jobMap.containsKey(job.getJobId()));
             
             boolean allDone = true;
@@ -136,7 +136,7 @@ public class MockLsfTests {
         jt.setErrorPath(outputDirPath+"/err.#");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
 
-        Integer jobId = 12345;
+        Long jobId = 12345L;
         
         when(subCmd.execute(jt, 1, 4))
             .thenReturn(TestUtils.newInfo(jobId, JobStatus.PENDING));
@@ -147,15 +147,15 @@ public class MockLsfTests {
             .thenReturn(Arrays.asList(TestUtils.newInfo(jobId, JobStatus.DONE, 0)));
         
 
-        JobInfo info1 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 1);
-        JobInfo info2 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 2);
-        JobInfo info3 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 3);
-        JobInfo info4 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 4);
+        JobInfo info1 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 1L);
+        JobInfo info2 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 2L);
+        JobInfo info3 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 3L);
+        JobInfo info4 = TestUtils.newInfo(jobId, JobStatus.RUNNING, null, 4L);
         
-        JobInfo info1Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 1);
-        JobInfo info2Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 2);
-        JobInfo info3Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 3);
-        JobInfo info4Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 4);
+        JobInfo info1Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 1L);
+        JobInfo info2Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 2L);
+        JobInfo info3Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 3L);
+        JobInfo info4Done = TestUtils.newInfo(jobId, JobStatus.DONE, 0, 4L);
         
         when(jobsCmd.execute())
             .thenReturn(Arrays.asList(info1, info2, info3, info4))
@@ -173,7 +173,7 @@ public class MockLsfTests {
             List<JobInfo> jobs = jobsCmd.execute();
             Assert.assertNotNull(jobs);
             
-            Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
+            Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
             Assert.assertTrue(jobMap.containsKey(job.getJobId()));
             
             boolean allDone = true;
