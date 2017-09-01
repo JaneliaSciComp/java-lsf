@@ -31,6 +31,27 @@ public class ParseTests {
     }
 
     @Test
+    public void testDateParserWithYear() throws ParseException {
+        LocalDateTime date = LsfUtils.parseDate("Mar 10 12:30 2011");
+        Assert.assertEquals(Month.MARCH, date.getMonth());
+        Assert.assertEquals(10, date.getDayOfMonth());
+        Assert.assertEquals(12, date.getHour());
+        Assert.assertEquals(30, date.getMinute());
+        Assert.assertEquals(2011, date.getYear());
+    }
+
+    @Test
+    public void testSingleDigitDayWithYear() throws ParseException {
+        LocalDateTime date = LsfUtils.parseDate("Sep  8 16:10:45 2017 E");
+        Assert.assertEquals(Month.SEPTEMBER, date.getMonth());
+        Assert.assertEquals(8, date.getDayOfMonth());
+        Assert.assertEquals(16, date.getHour());
+        Assert.assertEquals(10, date.getMinute());
+        Assert.assertEquals(45, date.getSecond());
+        Assert.assertEquals(2017, date.getYear());
+    }
+
+    @Test
     public void testNullIntParse() throws ParseException {
         Assert.assertNull(LsfUtils.parseInt(null));
     }

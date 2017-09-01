@@ -92,10 +92,28 @@ public class LsfJobsCommand {
                 info.setProject(project);
                 info.setReqSlot(LsfUtils.parseInt(reqSlot));
                 info.setAllocSlot(LsfUtils.parseInt(allocSlot));
-                info.setSubmitTime(LsfUtils.parseDate(submitTime));
-                info.setStartTime(LsfUtils.parseDate(startTime));
-                info.setFinishTime(LsfUtils.parseDate(finishTime));
                 info.setMaxMem(maxMem);
+
+                try {
+                    info.setSubmitTime(LsfUtils.parseDate(submitTime));
+                }
+                catch (DateTimeParseException e) {
+                    log.error("Error parsing date: "+submitTime);
+                }
+
+                try {
+                    info.setStartTime(LsfUtils.parseDate(startTime));
+                }
+                catch (DateTimeParseException e) {
+                    log.error("Error parsing date: "+startTime);
+                }
+
+                try {
+                    info.setFinishTime(LsfUtils.parseDate(finishTime));
+                }
+                catch (DateTimeParseException e) {
+                    log.error("Error parsing date: "+finishTime);
+                }
 
                 // LSF does not give an exit code unless it is non-zero
                 Integer exitCode = LsfUtils.parseInt(exitCodeStr);
@@ -103,11 +121,6 @@ public class LsfJobsCommand {
                 info.setExitCode(exitCode);
 
                 return info;
-            }
-            catch (DateTimeParseException e) {
-                // We probably don't need the stack trace for debugging this type of parse error
-                log.error("Error parsing date: "+line);
-                return null;
             }
             catch (Exception e) {
                 log.error("Error parsing line: "+line, e);

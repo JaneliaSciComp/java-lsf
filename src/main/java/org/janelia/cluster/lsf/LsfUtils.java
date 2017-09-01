@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 public class LsfUtils {
     
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MMM dd HH:mm yyyy");
+    private static final DateTimeFormatter DATE_FORMAT_SECS = DateTimeFormatter.ofPattern("MMM dd HH:mm:ss yyyy");
 
     public static LocalDateTime parseDate(String str) throws ParseException {
         if (str==null) return null;
@@ -21,8 +22,14 @@ public class LsfUtils {
         str = str.trim().replaceAll("  ", " 0");
         // Remove the E for "Estimated" and other such characters from the end of dates.
         str = str.replaceAll("( \\w)$", "");
-        // Add the current year because LSF is saving valuable space by not sending it. Things will get very interesting on Jan 1st. 
-        String dateStr = str + " " + LocalDateTime.now().getYear();
+        // If necessary, add the current year (necessary before the 10.1.0.3 service pack)
+        String dateStr = str;
+        if (!dateStr.matches(".*\\d{4}")) {
+            dateStr = dateStr + " " + LocalDateTime.now().getYear();
+        }
+        if (dateStr.matches(".*\\d{2}:\\d{2}:\\d{2}.*")) {
+            return LocalDateTime.parse(dateStr, DATE_FORMAT_SECS);
+        }
         return LocalDateTime.parse(dateStr, DATE_FORMAT);
     }
 
