@@ -89,11 +89,14 @@ public class LsfSubCommand {
         env.put(BSUB_ENV_REPORT_MAIL, isJobReportMail ? "y":"n");
 
         Process p = processBuilder.start();
-        
+
+        StringBuilder output = new StringBuilder();
         JobInfo info = null;
         try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
             String line;
             while ((line = input.readLine()) != null) {
+                output.append(line).append("\n");
+                log.trace(BSUB_COMMAND+" output: {}", line);
                 Matcher m = SUCCESS_PATTERN.matcher(line);
                 if (m.matches()) {
                     Long jobId = LsfUtils.parseLong(m.group(1));
@@ -114,6 +117,7 @@ public class LsfSubCommand {
             exitValue = p.exitValue();
             log.trace("exitValue: "+exitValue);
             if (exitValue!=0) {
+                log.warn(BSUB_COMMAND+" failed with exit code {}. Output:\n{}", exitValue, output);
                 throw new IOException(BSUB_COMMAND+" exited with code "+exitValue);
             }
         }

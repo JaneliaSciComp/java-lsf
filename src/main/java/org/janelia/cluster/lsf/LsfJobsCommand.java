@@ -149,11 +149,13 @@ public class LsfJobsCommand {
         processBuilder.redirectErrorStream(true);
         Process p = processBuilder.start();
 
+        StringBuilder output = new StringBuilder();
         List<JobInfo> statusList = new ArrayList<>();
         try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
             String line;
             while ((line = input.readLine()) != null) {
-                log.trace("Output: "+line);
+                output.append(line).append("\n");
+                log.trace(BJOBS_COMMAND+" output: {}", line);
                 JobInfo info = parser.apply(line);
                 if (info!=null) {
                     statusList.add(info);
@@ -168,6 +170,7 @@ public class LsfJobsCommand {
             exitValue = p.exitValue();
             log.trace("exitValue: "+exitValue);
             if (exitValue!=0) {
+                log.warn(BJOBS_COMMAND+" failed with exit code {}. Output:\n{}", exitValue, output);
                 throw new IOException(BJOBS_COMMAND+" exited with code "+exitValue);
             }
         }
