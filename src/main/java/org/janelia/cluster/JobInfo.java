@@ -27,6 +27,7 @@ public class JobInfo {
     private LocalDateTime finishTime;
     private String maxMem;
     private Integer exitCode;
+    private String exitReason;
     
     /**
      * Job identifier for the job or job array.
@@ -194,6 +195,18 @@ public class JobInfo {
     }
 
     /**
+     * Final exit reason for the job.
+     * @return
+     */
+    public String getExitReason() {
+        return exitReason;
+    }
+
+    public void setExitReason(String exitReason) {
+        this.exitReason = exitReason;
+    }
+
+    /**
      * Returns true if the job has started executing.
      */
     public boolean isStarted() {
@@ -211,7 +224,8 @@ public class JobInfo {
     public String toString() {
         return "JobInfo[jobId=" + jobId + ", arrayIndex=" + arrayIndex + ", name=" + name + ", fromHost=" + fromHost
                 + ", execHost=" + execHost + ", status=" + status + ", queue=" + queue + ", project=" + project
-                + ", reqSlot=" + reqSlot + ", allocSlot=" + allocSlot + ", submitTime=" + submitTime + ", startTime="
-                + startTime + ", finishTime=" + finishTime + ", maxMem=" + maxMem + ", exitCode=" + exitCode + "]";
+                + ", reqSlot=" + reqSlot + ", allocSlot=" + allocSlot + ", submitTime=" + submitTime
+                + ", startTime=" + startTime + ", finishTime=" + finishTime + ", maxMem=" + maxMem
+                + ", exitCode=" + exitCode + ", exitReason=" + exitReason + "]";
     }
 }

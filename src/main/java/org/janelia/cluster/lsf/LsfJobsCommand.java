@@ -31,7 +31,7 @@ public class LsfJobsCommand {
     private static final String FORMAT_SPEC =
             "jobid name from_host exec_host stat queue project "
             + "max_req_proc nalloc_slot submit_time start_time finish_time "
-            + "max_mem exit_code delimiter='"+BJOBS_DELIMITER+"'";
+            + "max_mem exit_code exit_reason delimiter='"+BJOBS_DELIMITER+"'";
 
     public List<JobInfo> execute() throws IOException {
         return execute(null);
@@ -81,6 +81,7 @@ public class LsfJobsCommand {
                 String finishTime = getValue(split, c++);
                 String maxMem = getValue(split, c++);
                 String exitCodeStr = getValue(split, c++);
+                String exitReason = getValue(split, c++);
 
                 LsfJobInfo info = new LsfJobInfo();
                 info.setJobId(LsfUtils.parseLong(jobIdStr));
@@ -119,6 +120,7 @@ public class LsfJobsCommand {
                 Integer exitCode = LsfUtils.parseInt(exitCodeStr);
                 if (exitCode==null && info.getStatus().isDone()) exitCode = 0;
                 info.setExitCode(exitCode);
+                info.setExitReason(exitReason);
 
                 return info;
             }
