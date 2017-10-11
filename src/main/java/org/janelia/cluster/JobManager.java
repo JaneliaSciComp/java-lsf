@@ -73,7 +73,7 @@ public class JobManager {
 
     private JobFuture recordInfo(JobInfo info) {
         JobFuture future = new JobFuture(info.getJobId());
-        JobMetadata metadata = new JobMetadata(false, new Date(), null, future);
+        JobMetadata metadata = new JobMetadata(false, new Date(), Collections.emptyList(), future);
         jobMetadataMap.put(info.getJobId(), metadata);
         return future;
     }
@@ -99,7 +99,16 @@ public class JobManager {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
-    
+
+    /**
+     * Returns tracking metadata for the given job.
+     * @param jobId job id
+     * @return job metadata
+     */
+    public JobMetadata getJobMetadata(Long jobId) {
+        return jobMetadataMap.get(jobId);
+    }
+
     /**
      * Returns the latest JobInfos for the given job.
      * @param jobId job id
@@ -245,37 +254,6 @@ public class JobManager {
         }
         finally {
             checkRunning.set(false);
-        }
-    }
-
-    private class JobMetadata {
-
-        private final boolean done;
-        private final Date lastUpdated;
-        private final Collection<JobInfo> lastInfos;
-        private final JobFuture future;
-
-        public JobMetadata(boolean done, Date lastUpdated, Collection<JobInfo> lastInfos, JobFuture future) {
-            this.done = done;
-            this.lastUpdated = lastUpdated;
-            this.lastInfos = lastInfos;
-            this.future = future;
-        }
-
-        public boolean isDone() {
-            return done;
-        }
-        
-        public Date getLastUpdated() {
-            return lastUpdated;
-        }
-
-        public Collection<JobInfo> getLastInfos() {
-            return lastInfos;
-        }
-
-        public JobFuture getFuture() {
-            return future;
         }
     }
 }
