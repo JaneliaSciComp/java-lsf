@@ -53,7 +53,7 @@ public class MockJobManagerTests {
             }
 
             @Override
-            public JobInfo submitJobs(JobTemplate jt, Integer start, Integer end) throws IOException {
+            public JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException {
                 return subCmd.execute(jt, start, end);
             }
         };
@@ -101,7 +101,7 @@ public class MockJobManagerTests {
 
         Long jobId = 10000L;
         
-        when(subCmd.execute(jt, 1, 4))
+        when(subCmd.execute(jt, 1L, 4L))
             .thenReturn(TestUtils.newInfo(jobId, JobStatus.PENDING));
         
         when(jobsCmd.execute())

@@ -138,7 +138,7 @@ public class MockLsfTests {
 
         Long jobId = 12345L;
         
-        when(subCmd.execute(jt, 1, 4))
+        when(subCmd.execute(jt, 1L, 4L))
             .thenReturn(TestUtils.newInfo(jobId, JobStatus.PENDING));
         
         when(jobsCmd.execute())
@@ -161,7 +161,7 @@ public class MockLsfTests {
             .thenReturn(Arrays.asList(info1, info2, info3, info4))
             .thenReturn(Arrays.asList(info1Done, info2Done, info3Done, info4Done));
         
-        JobInfo job = subCmd.execute(jt, 1, 4);
+        JobInfo job = subCmd.execute(jt, 1L, 4L);
 
         Assert.assertNotNull(job);
         Assert.assertNotNull(job.getJobId());

@@ -65,7 +65,7 @@ public class JobManager {
      * @return a future collection containing the completed JobInfos
      * @throws Exception if there is an error submitting the jobs
      */
-    public JobFuture submitJob(JobTemplate jt, int start, int end) throws Exception {
+    public JobFuture submitJob(JobTemplate jt, long start, long end) throws Exception {
         JobInfo info = jobSyncApi.submitJobs(jt, start, end);
         log.debug("Submitted job array {} ({}-{})", info.getJobId(), start, end);
         return recordInfo(info);
@@ -114,7 +114,7 @@ public class JobManager {
      * @param jobId job id
      * @return collection of the JobInfos, or null if we have no information for that job
      */
-    public Collection<JobInfo> getJobInfo(Integer jobId) {
+    public Collection<JobInfo> getJobInfo(Long jobId) {
         JobMetadata metadata = jobMetadataMap.get(jobId);
         if (metadata != null) {
             return metadata.getLastInfos();
@@ -128,7 +128,7 @@ public class JobManager {
      * @param arrayIndex array index 
      * @return JobInfo, or null if we have no information for that job
      */
-    public JobInfo getJobInfo(Integer jobId, Integer arrayIndex) {
+    public JobInfo getJobInfo(Long jobId, Long arrayIndex) {
         JobMetadata metadata = jobMetadataMap.get(jobId);
         if (metadata != null) {
             for (JobInfo jobInfo : metadata.getLastInfos()) {

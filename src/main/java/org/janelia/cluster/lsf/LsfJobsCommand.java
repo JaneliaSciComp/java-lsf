@@ -145,7 +145,7 @@ public class LsfJobsCommand {
         cmd.add(BJOBS_COMMAND);
         cmd.addAll(args);
         
-        log.debug("Running: {}", cmd);
+        log.trace("Running: {}", cmd);
         
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);

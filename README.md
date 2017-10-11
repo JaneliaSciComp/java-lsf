@@ -60,7 +60,7 @@ If you'd like to check the status of a specific job without spinning up a backgr
 JobSyncApi api = new LsfSyncApi();
 
 List<JobInfo> jobs = api.getJobInfo();
-Multimap<Integer, JobInfo> jobMap = Utils.getJobMap(jobs);
+Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
 // infos will contain one object for every job running on the grid with the given jobId
 List<JobInfo> infos = jobMap.get(jobId);
 ```

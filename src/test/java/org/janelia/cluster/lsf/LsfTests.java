@@ -113,7 +113,7 @@ public class LsfTests {
         jt.setErrorPath(outputDirPath+"/err.#");
         jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
         
-        JobInfo job = subCmd.execute(jt, 1, 4);
+        JobInfo job = subCmd.execute(jt, 1L, 4L);
 
         Assert.assertNotNull(job.getJobId());
 

@@ -39,7 +39,7 @@ public class LsfSubCommand {
         return execute(jt, null, null);
     }
     
-    public JobInfo execute(JobTemplate jt, Integer start, Integer end) throws IOException {
+    public JobInfo execute(JobTemplate jt, Long start, Long end) throws IOException {
 
         List<String> cmd = new ArrayList<>();
         cmd.add(BSUB_COMMAND);
@@ -80,7 +80,7 @@ public class LsfSubCommand {
         cmd.add(jt.getRemoteCommand());
         cmd.addAll(jt.getArgs());
 
-        log.debug("Running: {}", cmd);
+        log.trace("Running: {}", cmd);
         
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
@@ -168,7 +168,7 @@ public class LsfSubCommand {
             jt.setErrorPath(outputDirPath+"/err.#");
             jt.setNativeSpecification(Arrays.asList("-W 1", "-n 2"));
             
-            JobInfo job = commands.execute(jt, 1, 4);
+            JobInfo job = commands.execute(jt, 1L, 4L);
             log.info("Submitted job as {}", job.getJobId());
         }
         catch (IOException e) {

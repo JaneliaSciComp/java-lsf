@@ -44,7 +44,7 @@ public class LsfSyncApi implements JobSyncApi {
     }
 
     @Override
-    public JobInfo submitJobs(JobTemplate jt, Integer start, Integer end) throws IOException {
+    public JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException {
         return subCmd.execute(jt, start, end);
     }
 }

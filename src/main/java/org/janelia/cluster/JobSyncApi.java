@@ -26,7 +26,7 @@ public interface JobSyncApi {
      * @return initial JobINfo containing the job array's main id on the cluster
      * @throws IOException
      */
-    public JobInfo submitJobs(JobTemplate jt, Integer start, Integer end) throws IOException;
+    public JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException;
     
     /**
      * Returns fresh job info for the current user from the cluster.
