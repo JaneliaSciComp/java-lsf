@@ -238,8 +238,12 @@ public class JobManager {
                             // No new info about this job means that it's a zombie
                             if (Utils.getDateDiff(currMetadata.getLastUpdated(), now, TimeUnit.MINUTES) > keepZombiesMinutes) {
                                 log.warn("Removing zombie job: {}", jobId);
-                                jobMetadataMap.remove(jobId);
-                                Exception e = new Exception("Job "+jobId+" was identified as a zombie and removed");
+
+                                // Update the map with new metadata, forcing done=true, so that this zombie can be reaped later
+                                JobMetadata newMetadata = new JobMetadata(true, now, newInfos, currMetadata.getFuture());
+                                jobMetadataMap.put(jobId, newMetadata);
+
+                                Exception e = new Exception("Job "+jobId+" was identified as a zombie, and force completed.");
                                 currMetadata.getFuture().completeExceptionally(e);
                             }
                         }
