@@ -42,4 +42,11 @@ public interface JobSyncApi {
      * @throws IOException
      */
     public List<JobInfo> getJobInfo(String user) throws IOException;
+
+    /**
+     * Kills the given job.
+     * @param jobId
+     * @throws IOException
+     */
+    public void killJob(Long jobId) throws IOException;
 }

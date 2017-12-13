@@ -18,14 +18,16 @@ public class LsfSyncApi implements JobSyncApi {
 
     private final LsfSubCommand subCmd;
     private final LsfJobsCommand jobsCmd;
-    
+    private final LsfKillCommand killCmd;
+
     public LsfSyncApi() {
-        this(new LsfSubCommand(), new LsfJobsCommand());
+        this(new LsfSubCommand(), new LsfJobsCommand(), new LsfKillCommand());
     }
     
-    public LsfSyncApi(LsfSubCommand subCmd, LsfJobsCommand jobsCmd) {
+    public LsfSyncApi(LsfSubCommand subCmd, LsfJobsCommand jobsCmd, LsfKillCommand killCmd) {
         this.subCmd = subCmd;
         this.jobsCmd = jobsCmd;
+        this.killCmd = killCmd;
     }
 
     @Override
@@ -46,5 +48,10 @@ public class LsfSyncApi implements JobSyncApi {
     @Override
     public JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException {
         return subCmd.execute(jt, start, end);
+    }
+
+    @Override
+    public void killJob(Long jobId) throws IOException {
+        killCmd.execute(jobId);
     }
 }

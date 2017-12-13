@@ -79,6 +79,15 @@ public class JobManager {
     }
 
     /**
+     * Kill the job with the given id. 
+     * @param jobId
+     * @throws Exception
+     */
+    public void killJob(Long jobId) throws Exception {
+        jobSyncApi.killJob(jobId);
+    }
+
+    /**
      * Returns the job ids of any jobs which were being monitored and are now complete.
      * @return collection of job ids
      */
