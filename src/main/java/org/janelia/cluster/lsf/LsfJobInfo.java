@@ -5,6 +5,10 @@ import org.janelia.cluster.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Parsing for LSF-specific job info from bjobs.
  *
@@ -85,20 +89,9 @@ public class LsfJobInfo extends JobInfo {
         }
     }
 
-    @Override
-    public void setExecHost(String execHost) {
-        try {
-            if (execHost!=null) {
-                int s1 = execHost.indexOf('*');
-                if (s1>0) {
-                    execHost = execHost.substring(s1+1);
-                }
-            }
-        }
-        catch (Exception e) {
-            log.warn("Problem parsing LSF exec host: "+execHost, e);
-        }
-        super.setExecHost(execHost);
+    public List<String> getExecHosts() {
+        String execHost = getExecHost();
+        return execHost==null ? Collections.emptyList() : Arrays.asList(execHost.split("\\:"));
     }
     
 }
