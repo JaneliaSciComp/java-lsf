@@ -31,7 +31,7 @@ public class LsfSubCommand {
 
     private static final String BSUB_COMMAND = "bsub";
     private static final String BSUB_ENV_REPORT_MAIL = "LSB_JOB_REPORT_MAIL";
-    private static final Pattern SUCCESS_PATTERN = Pattern.compile("Job <(\\d+)> is submitted to \\S+ queue <(.+)>.");
+    private static final Pattern SUCCESS_PATTERN = Pattern.compile("Job <(\\d+)> is submitted to (?:\\S+ )?queue <(.+)>.");
 
     private boolean isJobReportMail = false;
 
@@ -108,6 +108,11 @@ public class LsfSubCommand {
                     break;
                 }
             }
+        }
+
+        if (info==null) {
+            log.warn(BSUB_COMMAND+" failed to return job id. Output:\n{}", output);
+            throw new IOException(BSUB_COMMAND+" failed to return job id");
         }
 
         int exitValue;
