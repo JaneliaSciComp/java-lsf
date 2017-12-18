@@ -79,7 +79,7 @@ public class JobManager {
     }
 
     /**
-     * Kill the job with the given id. 
+     * Kill the job with the given id.
      * @param jobId
      * @throws Exception
      */
@@ -205,11 +205,18 @@ public class JobManager {
                 Multimap<Long, JobInfo> jobMap = Utils.getJobMap(jobs);
                 Date now = new Date();
 
+                Collection<Long> runningJobIds = getRunningJobIds();
+
                 if (log.isDebugEnabled()) {
-                    log.debug("Monitoring jobs: {}", getRunningJobIds());
+                    log.debug("Monitoring jobs: {}", runningJobIds);
                 }
                 else {
-                    log.info("Monitoring {} jobs", getRunningJobIds().size());
+                    if (runningJobIds.isEmpty()) {
+                        log.debug("Monitoring {} jobs", runningJobIds.size());
+                    }
+                    else {
+                        log.info("Monitoring {} jobs", runningJobIds.size());
+                    }
                 }
                 
                 for (Map.Entry<Long, JobMetadata> entry : jobMetadataMap.entrySet()) {
