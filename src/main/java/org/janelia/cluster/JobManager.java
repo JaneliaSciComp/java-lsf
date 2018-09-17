@@ -131,6 +131,17 @@ public class JobManager {
         return null;
     }
 
+    public Collection<JobInfo> retrieveJobInfo(Long jobId) {
+        List<JobInfo> jobInfoList;
+        try {
+            jobInfoList = jobSyncApi.getJobInfo(jobId);
+        } catch (Exception e) {
+            log.error("Error retrieving job info for {}", jobId, e);
+            jobInfoList = Collections.emptyList();
+        }
+        return jobInfoList;
+    }
+
     /**
      * Returns the latest JobInfo for the given job.
      * @param jobId job id

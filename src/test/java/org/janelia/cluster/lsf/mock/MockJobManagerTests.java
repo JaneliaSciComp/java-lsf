@@ -3,6 +3,7 @@ package org.janelia.cluster.lsf.mock;
 import org.apache.commons.io.FileUtils;
 import org.janelia.cluster.*;
 import org.janelia.cluster.lsf.LsfJobsCommand;
+import org.janelia.cluster.lsf.LsfKillCommand;
 import org.janelia.cluster.lsf.LsfSubCommand;
 import org.janelia.cluster.lsf.TestUtils;
 import org.junit.After;
@@ -23,6 +24,7 @@ public class MockJobManagerTests {
 
     private LsfSubCommand subCmd;
     private LsfJobsCommand jobsCmd;
+    private LsfKillCommand killCmd;
     private JobSyncApi syncApi;
     
     private JobManager mgr;
@@ -35,6 +37,7 @@ public class MockJobManagerTests {
     public JobSyncApi createSyncApi() {
         subCmd = mock(LsfSubCommand.class);
         jobsCmd = mock(LsfJobsCommand.class);
+        killCmd = mock(LsfKillCommand.class);
         syncApi = new JobSyncApi() {
 
             @Override
@@ -44,7 +47,12 @@ public class MockJobManagerTests {
 
             @Override
             public List<JobInfo> getJobInfo(String user) throws IOException {
-                return jobsCmd.execute(user);
+                return jobsCmd.execute(user, null);
+            }
+
+            @Override
+            public List<JobInfo> getJobInfo(Long jobId) throws IOException {
+                return jobsCmd.execute(null, jobId);
             }
 
             @Override
@@ -55,6 +63,11 @@ public class MockJobManagerTests {
             @Override
             public JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException {
                 return subCmd.execute(jt, start, end);
+            }
+
+            @Override
+            public void killJob(Long jobId) throws IOException {
+                killCmd.execute(jobId);
             }
         };
         return syncApi;

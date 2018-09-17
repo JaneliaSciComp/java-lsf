@@ -37,7 +37,12 @@ public class LsfSyncApi implements JobSyncApi {
 
     @Override
     public List<JobInfo> getJobInfo(String user) throws IOException {
-        return jobsCmd.execute(user);
+        return jobsCmd.execute(user, null);
+    }
+
+    @Override
+    public List<JobInfo> getJobInfo(Long jobId) throws IOException {
+        return jobsCmd.execute(null, jobId);
     }
 
     @Override

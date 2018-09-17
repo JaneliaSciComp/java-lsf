@@ -16,7 +16,7 @@ public interface JobSyncApi {
      * @return initial JobInfo containing the job's id on the cluster
      * @throws IOException
      */
-    public JobInfo submitJob(JobTemplate jt) throws IOException;
+    JobInfo submitJob(JobTemplate jt) throws IOException;
     
     /**
      * Submit the given job array for execution on the cluster.
@@ -26,14 +26,14 @@ public interface JobSyncApi {
      * @return initial JobINfo containing the job array's main id on the cluster
      * @throws IOException
      */
-    public JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException;
+    JobInfo submitJobs(JobTemplate jt, Long start, Long end) throws IOException;
     
     /**
      * Returns fresh job info for the current user from the cluster.
      * @return
      * @throws IOException
      */
-    public List<JobInfo> getJobInfo() throws IOException;
+    List<JobInfo> getJobInfo() throws IOException;
     
     /**
      * Returns fresh job info for the given user from the cluster.
@@ -41,12 +41,20 @@ public interface JobSyncApi {
      * @return
      * @throws IOException
      */
-    public List<JobInfo> getJobInfo(String user) throws IOException;
+    List<JobInfo> getJobInfo(String user) throws IOException;
+
+    /**
+     * Returns fresh job info for the id from the cluster.
+     * @param jobId
+     * @return
+     * @throws IOException
+     */
+    List<JobInfo> getJobInfo(Long jobId) throws IOException;
 
     /**
      * Kills the given job.
      * @param jobId
      * @throws IOException
      */
-    public void killJob(Long jobId) throws IOException;
+    void killJob(Long jobId) throws IOException;
 }

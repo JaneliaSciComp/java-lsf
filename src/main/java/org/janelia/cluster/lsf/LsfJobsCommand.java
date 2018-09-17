@@ -34,14 +34,14 @@ public class LsfJobsCommand {
             + "max_mem exit_code exit_reason delimiter='"+BJOBS_DELIMITER+"'";
 
     public List<JobInfo> execute() throws IOException {
-        return execute(null);
+        return execute(null, null);
     }
     
-    public List<JobInfo> execute(String user) throws IOException {
+    public List<JobInfo> execute(String user, Long jobId) throws IOException {
 
         List<String> args = new ArrayList<>();
-        
-        if (user!=null) {
+
+        if (user != null) {
             args.add("-u");
             args.add(user);
         }
@@ -49,6 +49,9 @@ public class LsfJobsCommand {
         args.add("-X"); // bring back expanded hostnames
         args.add("-o"); // format the output
         args.add(FORMAT_SPEC);
+        if (jobId != null) {
+            args.add(jobId.toString());
+        }
         
         return runJobsCommand(args, (line) -> {
 
