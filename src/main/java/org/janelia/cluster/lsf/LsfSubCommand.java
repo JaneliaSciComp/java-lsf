@@ -115,22 +115,24 @@ public class LsfSubCommand {
             throw new IOException(BSUB_COMMAND+" failed to return job id");
         }
 
-        int exitValue;
+        int exitValue = waitWhileAlive(p);
+        log.trace("exitValue: {}", exitValue);
+        if (exitValue != 0) {
+            log.warn(BSUB_COMMAND + " failed with exit code {}. Output:\n{}", exitValue, output);
+            throw new IOException(BSUB_COMMAND + " exited with code " + exitValue);
+        }
+        return info;
+    }
+
+    private int waitWhileAlive(Process p) {
         try {
             log.trace("Waiting for exit...");
-            p.waitFor(30, TimeUnit.SECONDS);
-            exitValue = p.exitValue();
-            log.trace("exitValue: "+exitValue);
-            if (exitValue!=0) {
-                log.warn(BSUB_COMMAND+" failed with exit code {}. Output:\n{}", exitValue, output);
-                throw new IOException(BSUB_COMMAND+" exited with code "+exitValue);
-            }
+            p.waitFor(100, TimeUnit.SECONDS);
+            return p.exitValue();
+        } catch (InterruptedException e) {
+            log.warn("Interrupt while waiting for process to end", e);
+            throw new IllegalStateException(BSUB_COMMAND+" did not exit cleanly", e);
         }
-        catch (InterruptedException e) {
-            throw new IOException(BSUB_COMMAND+" did not exit cleanly", e);
-        }
-        
-        return info;
     }
 
     /**

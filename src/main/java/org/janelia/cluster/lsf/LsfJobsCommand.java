@@ -126,8 +126,7 @@ public class LsfJobsCommand {
                 info.setExitReason(exitReason);
 
                 return info;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Error parsing line: "+line, e);
                 return null;
             }
@@ -168,24 +167,27 @@ public class LsfJobsCommand {
             }
         }
 
-        int exitValue;
-        try {
-            log.trace("Waiting for exit...");
-            p.waitFor(30, TimeUnit.SECONDS);
-            exitValue = p.exitValue();
-            log.trace("exitValue: "+exitValue);
-            if (exitValue!=0) {
-                log.warn(BJOBS_COMMAND+" failed with exit code {}. Output:\n{}", exitValue, output);
-                throw new IOException(BJOBS_COMMAND+" exited with code "+exitValue);
-            }
+        int exitValue = waitUntilDone(p);
+        log.trace("exitValue: {}", exitValue);
+        if (exitValue != 0) {
+            log.warn(BJOBS_COMMAND + " failed with exit code {}. Output:\n{}", exitValue, output);
+            throw new IOException(BJOBS_COMMAND + " exited with code " + exitValue);
         }
-        catch (InterruptedException e) {
-            throw new IOException(BJOBS_COMMAND+" did not exit cleanly", e);
-        }
-        
         return statusList;
     }
-    
+
+    private int waitUntilDone(Process p) {
+        try {
+            log.trace("Waiting for exit...");
+            p.waitFor(100, TimeUnit.SECONDS);
+            return p.exitValue();
+        } catch (InterruptedException e) {
+            log.warn("Interrupt while waiting for process to end", e);
+            throw new IllegalStateException(BJOBS_COMMAND+" did not exit cleanly", e);
+        }
+
+    }
+
     public static void main(String[] args) {
         
         LsfJobsCommand commands = new LsfJobsCommand();
