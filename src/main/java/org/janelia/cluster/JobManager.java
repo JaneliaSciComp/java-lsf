@@ -72,7 +72,7 @@ public class JobManager {
     }
 
     private JobFuture recordInfo(JobInfo info) {
-        JobFuture future = new JobFuture(info.getJobId());
+        JobFuture future = JobFuture.withJobId(info.getJobId());
         JobMetadata metadata = new JobMetadata(false, new Date(), Collections.emptyList(), future);
         jobMetadataMap.put(info.getJobId(), metadata);
         return future;
