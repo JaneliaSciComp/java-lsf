@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.janelia</groupId>
     <artifactId>java-lsf</artifactId>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
     <name>Java LSF API</name>
     <description>API for managing LSF cluster jobs from Java</description>
 
