@@ -1,8 +1,16 @@
 package org.janelia.cluster.lsf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utilities for dealing with LSF command line utilities.
@@ -10,7 +18,14 @@ import java.time.format.DateTimeFormatter;
  * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>
  */
 public class LsfUtils {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(LsfUtils.class);
+
+    private static final long KB = 1024;
+    private static final long MB = KB * 1024;
+    private static final long GB = MB * 1024;
+    private static final long TB = GB * 1024;
+
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MMM dd HH:mm yyyy");
     private static final DateTimeFormatter DATE_FORMAT_SECS = DateTimeFormatter.ofPattern("MMM dd HH:mm:ss yyyy");
 
@@ -41,5 +56,67 @@ public class LsfUtils {
     public static Long parseLong(String str) {
         if (str==null) return null;
         return new Long(str);
+    }
+
+    /**
+     * Convert the given LocalDateTime instance to an old-school Date.
+     * @param ldt
+     * @return date in the system time zone
+     */
+    public static Date convertLocalDateTime(LocalDateTime ldt) {
+        if (ldt == null) return null;
+        return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * Calculate the difference in seconds between two local date times.
+     * @param startTime
+     * @param finishTime
+     * @return number of seconds
+     */
+    public static Long getDiffSecs(LocalDateTime startTime, LocalDateTime finishTime) {
+        if (startTime==null || finishTime==null) return null;
+        return ChronoUnit.SECONDS.between(startTime, finishTime);
+    }
+
+    /**
+     * Parse LSF's max_mem field into a normalized number of bytes.
+     * @param memLsf
+     * @return number of bytes
+     */
+    public static Long parseMemToBytes(String memLsf) {
+        if (memLsf == null) return null;
+        Double bytes = null;
+
+        Pattern p = Pattern.compile("([\\d.]+)\\s+(\\w+)");
+        Matcher m = p.matcher(memLsf.trim());
+        if (m.matches()) {
+            double amount = Double.parseDouble(m.group(1));
+            String units = m.group(2).toLowerCase();
+
+            if (units.startsWith("k")) {
+                bytes = KB * amount;
+            }
+            else if (units.startsWith("m")) {
+                bytes = MB * amount;
+            }
+            else if (units.startsWith("g")) {
+                bytes = GB * amount;
+            }
+            else if (units.startsWith("t")) {
+                // Future proof!
+                bytes = TB * amount;
+            }
+            else {
+                log.warn("Could not parse units in max mem: '{}'", units);
+                return null;
+            }
+        }
+        else {
+            log.warn("Could not parse max mem: '{}'", memLsf);
+            return null;
+        }
+
+        return bytes.longValue();
     }
 }
