@@ -1,5 +1,6 @@
-package org.janelia.cluster.lsf;
+package org.janelia.cluster.lsf.mock;
 
+import org.janelia.cluster.lsf.LsfUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
