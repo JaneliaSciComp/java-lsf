@@ -1,6 +1,7 @@
 package org.janelia.cluster;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A generic template for a job to execute on the cluster.
@@ -20,6 +21,7 @@ public class JobTemplate {
     private String errorPath;
     private String jobName;
     private List<String> nativeSpecification;
+    private Map<String, String> jobEnvironment;
 
     public String getRemoteCommand() {
         return remoteCommand;
@@ -116,4 +118,11 @@ public class JobTemplate {
         this.nativeSpecification = nativeSpecification;
     }
 
+    public Map<String, String> getJobEnvironment() {
+        return jobEnvironment;
+    }
+
+    public void setJobEnvironment(Map<String, String> jobEnvironment) {
+        this.jobEnvironment = jobEnvironment;
+    }
 }

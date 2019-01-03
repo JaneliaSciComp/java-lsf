@@ -87,6 +87,9 @@ public class LsfSubCommand {
 
         Map<String, String> env = processBuilder.environment();
         env.put(BSUB_ENV_REPORT_MAIL, isJobReportMail ? "y":"n");
+        if (jt.getJobEnvironment() != null) {
+            env.putAll(jt.getJobEnvironment());
+        }
 
         Process p = processBuilder.start();
 
