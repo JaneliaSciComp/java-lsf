@@ -69,5 +69,6 @@ For more usage example, see the unit tests, in particular `org.janelia.cluster.l
 
 ## License 
 
-MIT License, see the LICENSE file for details.
+[Janelia Open Source License](https://www.janelia.org/open-science/software-licensing)
+
 
