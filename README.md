@@ -1,5 +1,7 @@
 # Java API to LSF
 
+[![CircleCI](https://circleci.com/gh/JaneliaSciComp/java-lsf.svg?style=svg)](https://circleci.com/gh/JaneliaSciComp/java-lsf)
+
 This is a simple wrapper library for using [IBM Platform LSF](https://en.wikipedia.org/wiki/Platform_LSF) from Java via command-line utilities such as bsub and bjobs. It is intended to be as simple an interface as possible, without the added complexity of DRMAA or the LSF APIs.
 
 The job management piece is abstracted in such a way that it could be extended for use with other job schedulers, or other job scheduler APIs, but currently LSF command line is the only implementation.
