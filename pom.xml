@@ -11,7 +11,18 @@
     <properties>
         <runSuite>**/MockTestSuite.class</runSuite>
     </properties>
-    
+
+    <distributionManagement>
+        <repository>
+            <id>janelia-releases</id>
+            <url>https://nexus.janelia.org/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>janelia-snapshots</id>
+            <url>https://nexus.janelia.org/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>ch.qos.logback</groupId>
