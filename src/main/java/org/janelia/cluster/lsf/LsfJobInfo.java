@@ -42,7 +42,7 @@ public class LsfJobInfo extends JobInfo {
             }
         }
         catch (Exception e) {
-            log.warn("Problem parsing LSF job name: "+lsfJobName, e);
+            log.warn("Problem parsing LSF job name: {}", lsfJobName, e);
             setName(lsfJobName);
         }
     }
@@ -82,10 +82,13 @@ public class LsfJobInfo extends JobInfo {
         else if ("UNKWN".equals(lsfJobStatus)) {
             setStatus(JobStatus.OTHER);
         }
+        else if ("ZOMBI".equals(lsfJobStatus)) {
+            setStatus(JobStatus.OTHER);
+        }
         else {
             setStatus(JobStatus.OTHER);
             Logger log = LoggerFactory.getLogger(JobStatus.class);
-            log.error("Unknown LSF job status: "+lsfJobStatus);
+            log.warn("Unknown LSF job status: {}", lsfJobStatus);
         }
     }
 
