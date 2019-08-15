@@ -114,14 +114,14 @@ public class LsfSubCommand {
         }
 
         if (info==null) {
-            log.warn(BSUB_COMMAND+" failed to return job id. Output:\n{}", output);
+            log.warn("{} failed to return job id. Output:\n{}", cmd, output);
             throw new IOException(BSUB_COMMAND+" failed to return job id");
         }
 
         int exitValue = waitWhileAlive(p);
         log.trace("exitValue: {}", exitValue);
         if (exitValue != 0) {
-            log.warn(BSUB_COMMAND + " failed with exit code {}. Output:\n{}", exitValue, output);
+            log.warn("{} failed with exit code {}. Output:\n{}", cmd, exitValue, output);
             throw new IOException(BSUB_COMMAND + " exited with code " + exitValue);
         }
         return info;
@@ -134,7 +134,7 @@ public class LsfSubCommand {
             return p.exitValue();
         } catch (InterruptedException e) {
             log.warn("Interrupt while waiting for process to end", e);
-            throw new IllegalStateException(BSUB_COMMAND+" did not exit cleanly", e);
+            return 1; // some non 0 value
         }
     }
 
