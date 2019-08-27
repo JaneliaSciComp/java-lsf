@@ -99,7 +99,7 @@ public class LsfSubCommand {
             String line;
             while ((line = input.readLine()) != null) {
                 output.append(line).append("\n");
-                log.debug("{} output: {}", BSUB_COMMAND, line);
+                log.info("{} output: {}", BSUB_COMMAND, line);
                 Matcher m = SUCCESS_PATTERN.matcher(line);
                 if (m.matches()) {
                     Long jobId = LsfUtils.parseLong(m.group(1));
