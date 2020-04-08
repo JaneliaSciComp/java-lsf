@@ -83,16 +83,16 @@ public class JobManager {
      * @param jobId
      * @throws Exception
      */
-    public void killJobById(Long jobId) throws Exception {
+    public void killJob(Long jobId) throws Exception {
         jobSyncApi.killJobById(jobId);
     }
 
     /**
-     * Kill the job with the given id.
+     * Kill the job with the given name.
      * @param jobName
      * @throws Exception
      */
-    public void killJobByName(String jobName) throws Exception {
+    public void killJobWithName(String jobName) throws Exception {
         jobSyncApi.killJobByName(jobName);
     }
 
