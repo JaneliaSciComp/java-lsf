@@ -142,7 +142,7 @@ public class LsfSubCommand {
      * If this is set to true, bsub will be called with the LSB_JOB_REPORT_MAIL=y environment variable,
      * otherwise it will be called with LSB_JOB_REPORT_MAIL=n.
      */
-    public boolean isJobReportMail() {
+    boolean isJobReportMail() {
         return isJobReportMail;
     }
 
@@ -150,7 +150,7 @@ public class LsfSubCommand {
      * If this is set to true, bsub will be called with the LSB_JOB_REPORT_MAIL=y environment variable,
      * otherwise it will be called with LSB_JOB_REPORT_MAIL=n.
      */
-    public void setJobReportMail(boolean jobReportMail) {
+    void setJobReportMail(boolean jobReportMail) {
         this.isJobReportMail = jobReportMail;
     }
 

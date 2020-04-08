@@ -21,13 +21,22 @@ public class LsfKillCommand {
 
     private static final String BKILL_COMMAND = "bkill";
 
-    public void execute(Long jobId) throws IOException {
+    public void executeWithJobName(String jobName) throws IOException {
+        execute("-J", jobName);
+    }
+
+    public void executeWithJobId(Long jobId) throws IOException {
+        execute(jobId.toString());
+    }
+
+    private void execute(String... args) throws IOException {
 
         List<String> cmd = new ArrayList<>();
         cmd.add(BKILL_COMMAND);
-        cmd.add(jobId.toString());
-
-        log.trace("Running: {}", cmd);
+        for (String arg : args) {
+            cmd.add(arg);
+        }
+        log.info("Running: {}", cmd);
         
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
@@ -58,4 +67,5 @@ public class LsfKillCommand {
             throw new IOException(BKILL_COMMAND +" did not exit cleanly", e);
         }
     }
+
 }

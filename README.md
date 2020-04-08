@@ -13,6 +13,30 @@ This project builds easily with Maven. For example:
 $ mvn package
 ```
 
+## Deploying to Janelia repo
+To deploy to Janelia nexus repository create a settings xml file like the one 
+below:
+```
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+   <servers>
+      <server>
+         <id>janelia-releases</id>
+         <username>yourusername</username>
+         <password>yourpassword</password>
+      </server>
+   </servers>
+
+</settings>
+```
+and then you can run. 
+```
+mvn -s <path_to_my_deploy_settings_xml> deploy
+```
+You can also add the server to your default settings.xml.
+
 ## Concepts
 
 The API contains of a generic job monitoring application (`org.janelia.cluster`) and an LSF implementation (`org.janelia.cluster.lsf`). Most of the concepts are taken directly from DRMAA:

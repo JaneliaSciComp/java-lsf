@@ -56,7 +56,12 @@ public class LsfSyncApi implements JobSyncApi {
     }
 
     @Override
-    public void killJob(Long jobId) throws IOException {
-        killCmd.execute(jobId);
+    public void killJobById(Long jobId) throws IOException {
+        killCmd.executeWithJobId(jobId);
+    }
+
+    @Override
+    public void killJobByName(String jobName) throws IOException {
+        killCmd.executeWithJobName(jobName);
     }
 }

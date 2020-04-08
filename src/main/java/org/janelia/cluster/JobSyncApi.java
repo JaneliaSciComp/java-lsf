@@ -56,5 +56,12 @@ public interface JobSyncApi {
      * @param jobId
      * @throws IOException
      */
-    void killJob(Long jobId) throws IOException;
+    void killJobById(Long jobId) throws IOException;
+
+    /**
+     * Kills the given job.
+     * @param jobName
+     * @throws IOException
+     */
+    void killJobByName(String jobName) throws IOException;
 }

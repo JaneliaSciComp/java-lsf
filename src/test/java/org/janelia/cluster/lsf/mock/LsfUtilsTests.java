@@ -1,12 +1,10 @@
 package org.janelia.cluster.lsf.mock;
 
+import java.time.LocalDateTime;
+
 import org.janelia.cluster.lsf.LsfUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:rokickik@janelia.hhmi.org">Konrad Rokicki</a>

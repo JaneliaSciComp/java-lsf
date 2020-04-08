@@ -1,7 +1,19 @@
 package org.janelia.cluster.lsf.mock;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
-import org.janelia.cluster.*;
+import org.janelia.cluster.JobFuture;
+import org.janelia.cluster.JobInfo;
+import org.janelia.cluster.JobManager;
+import org.janelia.cluster.JobMonitor;
+import org.janelia.cluster.JobStatus;
+import org.janelia.cluster.JobSyncApi;
+import org.janelia.cluster.JobTemplate;
 import org.janelia.cluster.lsf.LsfJobsCommand;
 import org.janelia.cluster.lsf.LsfKillCommand;
 import org.janelia.cluster.lsf.LsfSubCommand;
@@ -10,12 +22,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,8 +72,13 @@ public class MockJobManagerTests {
             }
 
             @Override
-            public void killJob(Long jobId) throws IOException {
-                killCmd.execute(jobId);
+            public void killJobById(Long jobId) throws IOException {
+                killCmd.executeWithJobId(jobId);
+            }
+
+            @Override
+            public void killJobByName(String jobName) throws IOException {
+                killCmd.executeWithJobName(jobName);
             }
         };
         return syncApi;
