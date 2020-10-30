@@ -92,9 +92,3 @@ List<JobInfo> infos = jobMap.get(jobId);
 ```
 
 For more usage example, see the unit tests, in particular `org.janelia.cluster.lsf.LsfTests`.
-
-## License 
-
-[Janelia Open Source License](https://www.janelia.org/open-science/software-licensing)
-
-
