@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,9 +34,7 @@ public class LsfKillCommand {
 
         List<String> cmd = new ArrayList<>();
         cmd.add(BKILL_COMMAND);
-        for (String arg : args) {
-            cmd.add(arg);
-        }
+        Collections.addAll(cmd, args);
         log.info("Running: {}", cmd);
         
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);

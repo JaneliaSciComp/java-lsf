@@ -3,7 +3,6 @@ package org.janelia.cluster.lsf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +28,7 @@ public class LsfUtils {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MMM dd HH:mm yyyy");
     private static final DateTimeFormatter DATE_FORMAT_SECS = DateTimeFormatter.ofPattern("MMM dd HH:mm:ss yyyy");
 
-    public static LocalDateTime parseDate(String str) throws ParseException {
+    public static LocalDateTime parseDate(String str) {
         if (str==null) return null;
         // LSF puts in spaces for text alignment purposes instead of padding with zeros. These unfortunately break the
         // date parser. The following is a relatively naive way to try to fix this, but it should work for all cases
@@ -50,12 +49,12 @@ public class LsfUtils {
 
     public static Integer parseInt(String str) {
         if (str==null) return null;
-        return new Integer(str);
+        return Integer.valueOf(str);
     }
 
     public static Long parseLong(String str) {
         if (str==null) return null;
-        return new Long(str);
+        return Long.valueOf(str);
     }
 
     /**
@@ -86,7 +85,7 @@ public class LsfUtils {
      */
     public static Long parseMemToBytes(String memLsf) {
         if (memLsf == null) return null;
-        Double bytes = null;
+        Double bytes;
 
         Pattern p = Pattern.compile("([\\d.]+)\\s+(\\w+)");
         Matcher m = p.matcher(memLsf.trim());
@@ -104,7 +103,7 @@ public class LsfUtils {
                 bytes = GB * amount;
             }
             else if (units.startsWith("t")) {
-                // Future proof!
+                // Future-proof!
                 bytes = TB * amount;
             }
             else {

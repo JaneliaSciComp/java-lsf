@@ -51,7 +51,7 @@ public class JobTemplate {
 
     /**
      * Sets the working directory (CWD) for the job to run inside.
-     * @param workingDir
+     * @param workingDir working directory
      */
     public void setWorkingDir(String workingDir) {
         this.workingDir = workingDir;

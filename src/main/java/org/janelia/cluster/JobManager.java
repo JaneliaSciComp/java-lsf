@@ -196,7 +196,7 @@ public class JobManager {
 
         log.trace("checkJobs");
 
-        // Ensure we only run one check at at time
+        // Ensure we only run one check at a time
         if (!checkRunning.compareAndSet(false, true)) {
             log.trace("Job check already running");
             return;
@@ -231,12 +231,7 @@ public class JobManager {
                     log.debug("Monitoring jobs: {}", runningJobIds);
                 }
                 else {
-                    if (runningJobIds.isEmpty()) {
-                        log.debug("Monitoring {} jobs", runningJobIds.size());
-                    }
-                    else {
-                        log.info("Monitoring {} jobs", runningJobIds.size());
-                    }
+                    log.info("Monitoring {} jobs", runningJobIds.size());
                 }
                 
                 for (Map.Entry<Long, JobMetadata> entry : jobMetadataMap.entrySet()) {

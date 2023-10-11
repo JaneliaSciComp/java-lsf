@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -171,7 +168,7 @@ public class LsfSubCommand {
         try {
             JobTemplate jt = new JobTemplate();
             jt.setRemoteCommand("bash");
-            jt.setArgs(Arrays.asList(scriptPath));
+            jt.setArgs(Collections.singletonList(scriptPath));
             jt.setJobName("testApi");
             jt.setInputPath(inputDirPath+"/input.#");
             jt.setOutputPath(outputDirPath+"/out.#");
