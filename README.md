@@ -1,6 +1,6 @@
 # Java API to LSF
 
-[![CircleCI](https://circleci.com/gh/JaneliaSciComp/java-lsf.svg?style=svg)](https://circleci.com/gh/JaneliaSciComp/java-lsf)
+![CI Build](https://github.com/github/docs/actions/workflows/maven.yml/badge.svg)
 
 This is a simple wrapper library for using [IBM Platform LSF](https://en.wikipedia.org/wiki/Platform_LSF) from Java via command-line utilities such as bsub and bjobs. It is intended to be as simple an interface as possible, without the added complexity of DRMAA or the LSF APIs.
 
