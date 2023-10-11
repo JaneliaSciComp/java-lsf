@@ -205,7 +205,7 @@ public class JobManager {
         try {
             // Are there any jobs to monitor? 
             if (jobMetadataMap.isEmpty()) {
-                log.trace("No jobs are being monitored");
+                log.debug("No jobs are being monitored");
                 return;
             }
             
@@ -276,6 +276,9 @@ public class JobManager {
 
                                 Exception e = new Exception("Job "+jobId+" was identified as a zombie, and force completed.");
                                 currMetadata.getFuture().completeExceptionally(e);
+                            }
+                            else {
+                                log.trace("Detected potential zombie job: {}", jobId);
                             }
                         }
                     }
