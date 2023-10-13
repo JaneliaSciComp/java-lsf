@@ -77,7 +77,7 @@ public class LsfSubCommand {
         cmd.add(jt.getRemoteCommand());
         cmd.addAll(jt.getArgs());
 
-        log.info("Running: {}", cmd);
+        log.debug("Running: {}", cmd);
         
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);
@@ -96,7 +96,7 @@ public class LsfSubCommand {
             String line;
             while ((line = input.readLine()) != null) {
                 output.append(line).append("\n");
-                log.info("{} output: {}", BSUB_COMMAND, line);
+                log.debug("{} output: {}", BSUB_COMMAND, line);
                 Matcher m = SUCCESS_PATTERN.matcher(line);
                 if (m.matches()) {
                     Long jobId = LsfUtils.parseLong(m.group(1));
