@@ -27,18 +27,17 @@ public class LsfKillCommand {
 
     public void executeWithJobName(String jobName, JobCmdFlag... flags) throws IOException {
         String[] execArgs = Stream.concat(
-                Stream.of("-J", jobName),
-                Arrays.stream(flags)
-                    .flatMap(f -> f.getFlags().stream()))
-                    .toArray(String[]::new);
+                Arrays.stream(flags).flatMap(f -> f.getFlags().stream()),
+                Stream.of("-J", jobName)
+        ).toArray(String[]::new);
         execute(execArgs);
     }
 
     public void executeWithJobId(Long jobId, JobCmdFlag... flags) throws IOException {
         String[] execArgs = Stream.concat(
-                Stream.of(jobId.toString()),
-                Arrays.stream(flags).flatMap(f -> f.getFlags().stream()))
-                .toArray(String[]::new);
+                Arrays.stream(flags).flatMap(f -> f.getFlags().stream()),
+                Stream.of(jobId.toString())
+        ).toArray(String[]::new);
         execute(execArgs);
     }
 
