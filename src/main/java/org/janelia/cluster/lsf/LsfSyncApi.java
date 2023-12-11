@@ -3,6 +3,7 @@ package org.janelia.cluster.lsf;
 import java.io.IOException;
 import java.util.List;
 
+import org.janelia.cluster.JobCmdFlag;
 import org.janelia.cluster.JobInfo;
 import org.janelia.cluster.JobSyncApi;
 import org.janelia.cluster.JobTemplate;
@@ -56,12 +57,12 @@ public class LsfSyncApi implements JobSyncApi {
     }
 
     @Override
-    public void killJobById(Long jobId) throws IOException {
-        killCmd.executeWithJobId(jobId);
+    public void killJobById(Long jobId, JobCmdFlag... flags) throws IOException {
+        killCmd.executeWithJobId(jobId, flags);
     }
 
     @Override
-    public void killJobByName(String jobName) throws IOException {
-        killCmd.executeWithJobName(jobName);
+    public void killJobByName(String jobName, JobCmdFlag... flags) throws IOException {
+        killCmd.executeWithJobName(jobName, flags);
     }
 }

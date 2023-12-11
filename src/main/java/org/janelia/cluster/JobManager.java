@@ -83,8 +83,8 @@ public class JobManager {
      * @param jobId
      * @throws Exception
      */
-    public void killJob(Long jobId) throws Exception {
-        jobSyncApi.killJobById(jobId);
+    public void killJob(Long jobId, JobCmdFlag... flags) throws Exception {
+        jobSyncApi.killJobById(jobId, flags);
     }
 
     /**
@@ -92,8 +92,8 @@ public class JobManager {
      * @param jobName
      * @throws Exception
      */
-    public void killJobWithName(String jobName) throws Exception {
-        jobSyncApi.killJobByName(jobName);
+    public void killJobWithName(String jobName, JobCmdFlag... flags) throws Exception {
+        jobSyncApi.killJobByName(jobName, flags);
     }
 
     /**

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.janelia.cluster.JobCmdFlag;
 import org.janelia.cluster.JobFuture;
 import org.janelia.cluster.JobInfo;
 import org.janelia.cluster.JobManager;
@@ -72,13 +73,13 @@ public class MockJobManagerTests {
             }
 
             @Override
-            public void killJobById(Long jobId) throws IOException {
-                killCmd.executeWithJobId(jobId);
+            public void killJobById(Long jobId, JobCmdFlag... flags) throws IOException {
+                killCmd.executeWithJobId(jobId, flags);
             }
 
             @Override
-            public void killJobByName(String jobName) throws IOException {
-                killCmd.executeWithJobName(jobName);
+            public void killJobByName(String jobName, JobCmdFlag... flags) throws IOException {
+                killCmd.executeWithJobName(jobName, flags);
             }
         };
         return syncApi;
